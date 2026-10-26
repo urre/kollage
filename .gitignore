@@ -1,0 +1,13 @@
+node_modules/
+dist/
+
+# Serverns loggar (bara på servern, men ifall man kör run.sh lokalt)
+logs/
+
+# Lokala testbilder
+.testimgs/
+
+# Lokala Claude Code-inställningar
+.claude/settings.local.json
+
+.DS_Store

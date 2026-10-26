@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev)",
+      "Bash(npm run dev *)",
+      "Bash(npm run build)",
+      "Bash(npm run typecheck)",
+      "Bash(npm run preview)",
+      "Bash(npm run preview *)",
+      "Bash(npx tsc --noEmit -p .)",
+      "Bash(npx vite *)",
+      "Bash(bash deploy.sh --dry-run)",
+      "Bash(ssh urbansanden@Roon-server-Mac.local *)",
+      "Bash(curl -s http://mollage.local*)",
+      "Bash(curl -sI http://mollage.local*)",
+      "Bash(curl -s http://Roon-server-Mac.local*)",
+      "Bash(curl -sI http://Roon-server-Mac.local*)",
+      "Bash(dscacheutil -q host -a name mollage.local)",
+      "Bash(magick *)",
+      "WebSearch",
+      "mcp__chrome-devtools__new_page",
+      "mcp__chrome-devtools__navigate_page",
+      "mcp__chrome-devtools__list_pages",
+      "mcp__chrome-devtools__select_page",
+      "mcp__chrome-devtools__emulate",
+      "mcp__chrome-devtools__resize_page",
+      "mcp__chrome-devtools__take_screenshot",
+      "mcp__chrome-devtools__take_snapshot",
+      "mcp__chrome-devtools__click",
+      "mcp__chrome-devtools__evaluate_script",
+      "mcp__chrome-devtools__upload_file",
+      "mcp__chrome-devtools__list_console_messages",
+      "mcp__chrome-devtools__get_console_message"
+    ]
+  }
+}
