@@ -106,6 +106,18 @@ export function CollageCanvas({ scene, ratio, selected, swapping, onTap, onSlot 
 
   useEffect(() => () => cancelAnimationFrame(settleFrame.current), [])
 
+  // iOS Safari zooms the page on a two-finger pinch even where `touch-action`
+  // is none, so a pinch on a cell would zoom the photo and the page at once.
+  // Only this element opts out; the rest of the page stays zoomable.
+  useEffect(() => {
+    const el = surfaceRef.current
+    if (!el) return
+    const stop = (e: Event) => e.preventDefault()
+    const types = ['gesturestart', 'gesturechange', 'gestureend']
+    types.forEach((t) => el.addEventListener(t, stop))
+    return () => types.forEach((t) => el.removeEventListener(t, stop))
+  }, [])
+
   const localPoint = (e: PointerEvent): Point => {
     const b = surfaceRef.current!.getBoundingClientRect()
     return { x: e.clientX - b.left, y: e.clientY - b.top }
