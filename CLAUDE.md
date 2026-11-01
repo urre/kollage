@@ -1,4 +1,4 @@
-# CLAUDE.md — Mollage
+# CLAUDE.md — Kollage
 
 A mobile-only web app for making photo collages: pick photos, choose how many
 cells and which layout, pan/zoom each photo, export a PNG or JPG. React 19 +
@@ -81,23 +81,27 @@ constantly (tab switches, layout changes), `prefers-reduced-motion` respected.
 
 ## Deploy
 
-**URL: [mollage-two.vercel.app](https://mollage-two.vercel.app)** (plain
-`mollage.vercel.app` was taken). Nothing to keep alive: no server process, no
-launchd, no LAN.
+**URL: [kollage-app.vercel.app](https://kollage-app.vercel.app)** — the
+Vercel project is `kollage`; both `kollage.vercel.app` and `mollage.vercel.app`
+belong to strangers, since that namespace is global. Nothing to keep alive: no
+server process, no launchd, no LAN.
 
-The Vercel project is connected to [github.com/urre/mollage](https://github.com/urre/mollage)
-(private) with `main` as the production branch, so **a push deploys** and every
-other branch gets a preview URL. `vercel.json` pins the framework and `dist/`
-so the build does not depend on autodetection. To deploy from here instead:
+The project is connected to [github.com/urre/mollage](https://github.com/urre/mollage)
+(private, still the old repo name) with `main` as the production branch, so
+**a push deploys** and every other branch gets a preview URL. `vercel.json`
+pins the framework and `dist/` so the build does not depend on autodetection.
+To deploy from here instead:
 
 ```bash
 vercel --prod
 ```
 
-Deployment Protection is on for generated deployment URLs
-(`mollage-<hash>-….vercel.app` answers 302 to Vercel's login) but not for the
-production domain, which is public. If a phone ever gets a login screen,
-check which of the two URLs it is on.
+Deployment Protection covers the generated deployment URLs
+(`kollage-<hash>-urban-sandens-projects.vercel.app` answers 302 to Vercel's
+login) but not the production domain, which is public. If a phone ever gets a
+login screen, check which of the two URLs it is on — and note that a project
+with *no* domain attached leaves only the protected URLs, so the app is behind
+the login wall until one is added back.
 
 The app is still **entirely client-side** — Vercel serves static files and
 there is no backend, no API route, no storage. Photos are read, drawn and
