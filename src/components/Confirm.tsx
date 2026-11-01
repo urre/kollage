@@ -1,7 +1,7 @@
 import { Sheet } from './Sheet'
 
-// A question in a sheet. window.confirm names the host on iOS ("mollage.local
-// säger…"), which is the loudest "this is a website" tell in the app.
+// A question in a sheet. window.confirm puts the host name on iOS's dialog
+// ("… säger"), which is the loudest "this is a website" tell in the app.
 export function Confirm({
   title,
   body,

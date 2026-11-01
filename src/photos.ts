@@ -5,8 +5,8 @@ import type { Photo } from './collage'
 const MAX_EDGE = 2048
 const THUMB_EDGE = 240
 
-// crypto.randomUUID needs a secure context, and the app is served over plain
-// http on the LAN, so ids come from a counter.
+// A counter, not crypto.randomUUID: ids only need to be unique within the
+// session, and this works wherever the app is opened from.
 let nextId = 1
 
 function scaledCanvas(src: CanvasImageSource, w: number, h: number, maxEdge: number) {

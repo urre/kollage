@@ -1,9 +1,6 @@
 node_modules/
 dist/
 
-# Serverns loggar (bara på servern, men ifall man kör run.sh lokalt)
-logs/
-
 # Lokala testbilder
 .testimgs/
 
@@ -11,3 +8,6 @@ logs/
 .claude/settings.local.json
 
 .DS_Store
+
+# Vercel
+.vercel
