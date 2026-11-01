@@ -81,19 +81,23 @@ constantly (tab switches, layout changes), `prefers-reduced-motion` respected.
 
 ## Deploy
 
-**Vercel**, from this repo ([github.com/urre/mollage](https://github.com/urre/mollage),
-private). Nothing to keep alive: no server process, no launchd, no LAN.
+**URL: [mollage-two.vercel.app](https://mollage-two.vercel.app)** (plain
+`mollage.vercel.app` was taken). Nothing to keep alive: no server process, no
+launchd, no LAN.
+
+The Vercel project is connected to [github.com/urre/mollage](https://github.com/urre/mollage)
+(private) with `main` as the production branch, so **a push deploys** and every
+other branch gets a preview URL. `vercel.json` pins the framework and `dist/`
+so the build does not depend on autodetection. To deploy from here instead:
 
 ```bash
-vercel login     # once per machine
-vercel link      # once per checkout — pick the mollage project
-vercel --prod    # build here, deploy
+vercel --prod
 ```
 
-Once the GitHub integration is connected in the Vercel dashboard, a push to
-`main` deploys on its own and every other branch gets a preview URL.
-`vercel.json` pins the framework and `dist/` so the build does not depend on
-autodetection.
+Deployment Protection is on for generated deployment URLs
+(`mollage-<hash>-….vercel.app` answers 302 to Vercel's login) but not for the
+production domain, which is public. If a phone ever gets a login screen,
+check which of the two URLs it is on.
 
 The app is still **entirely client-side** — Vercel serves static files and
 there is no backend, no API route, no storage. Photos are read, drawn and
