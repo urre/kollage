@@ -11,7 +11,7 @@ export function Start({ busy, error, onPick }: { busy: boolean; error: string | 
           <span />
           <span />
         </div>
-        <h1>Mollage</h1>
+        <h1>Kollage</h1>
         <p>Gör ett kollage av dina bilder. Välj layout, flytta och zooma, spara.</p>
       </div>
       <div className="start-actions">

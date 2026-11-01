@@ -130,7 +130,7 @@ export function App() {
         <button className="btn-text" onClick={() => setResetting(true)}>
           Börja om
         </button>
-        <span className="wordmark">Mollage</span>
+        <span className="wordmark">Kollage</span>
         <button className="btn btn-primary btn-small" onClick={() => setExporting(true)}>
           Spara
         </button>

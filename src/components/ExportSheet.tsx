@@ -26,7 +26,7 @@ const KINDS: { id: Kind; label: string; hint: string; mime: 'image/jpeg' | 'imag
 function fileName(kind: Kind) {
   const d = new Date()
   const pad = (n: number) => String(n).padStart(2, '0')
-  return `mollage-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.${kind}`
+  return `kollage-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.${kind}`
 }
 
 export function ExportSheet({ scene, format, empty, onClose }: { scene: Scene; format: Format; empty: number; onClose: () => void }) {

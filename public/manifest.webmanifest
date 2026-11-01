@@ -1,6 +1,6 @@
 {
-  "name": "Mollage",
-  "short_name": "Mollage",
+  "name": "Kollage",
+  "short_name": "Kollage",
   "description": "Gör kollage av dina bilder, direkt i mobilen.",
   "start_url": "./",
   "scope": "./",
