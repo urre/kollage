@@ -360,6 +360,15 @@ svg {
   border-style: dashed;
 }
 
+.ring-text {
+  border-width: 2px;
+  border-style: dashed;
+  border-radius: 10px;
+  /* The ring is under the finger while the caption is dragged, so it must
+     not ease behind it the way the cell ring does. */
+  transition: none;
+}
+
 /* Fixed height so the canvas never jumps when this row's content changes. */
 .context {
   display: flex;
@@ -367,6 +376,9 @@ svg {
   justify-content: center;
   height: 52px;
   padding: 0 var(--pad-right) 0 var(--pad-left);
+  /* A grid item is min-content wide by default, so the scrolling row below
+     would otherwise push the whole page wider than the screen. */
+  min-width: 0;
 }
 
 .context-hint {
@@ -378,10 +390,25 @@ svg {
   text-align: center;
 }
 
+/* Five actions do not fit across 360 px, so the row scrolls instead of
+   dropping the last one off the edge. It still centres while it fits. */
 .context-bar {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.context-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.context-bar > * {
+  flex: none;
 }
 
 .chip {
@@ -420,10 +447,23 @@ svg {
   background: var(--accent);
 }
 
+.chip-toggle {
+  width: 36px;
+  padding: 0;
+  justify-content: center;
+}
+
+.chip-toggle[data-active='true'] {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
 /* ── Panel ──────────────────────────────────────────────── */
 
+/* Tall enough for the text tab's three rows — input, typefaces, colours —
+   so the panel never changes height when you switch tabs. */
 .panel {
-  height: 140px;
+  height: 160px;
   padding: 12px var(--pad-right) 12px var(--pad-left);
   background: var(--surface);
   border-top: 1px solid var(--line);
@@ -743,6 +783,72 @@ input[type='range']::-moz-range-thumb {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18), 0 0 0 2px var(--surface), 0 0 0 4px var(--accent);
 }
 
+.text-panel {
+  gap: 8px;
+}
+
+.text-panel .scroller {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.text-input {
+  width: 100%;
+  height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: inherit;
+  /* 16px exactly: iOS Safari zooms the page into any smaller field on focus
+     and does not zoom back out. */
+  font-size: 16px;
+}
+
+.text-input::placeholder {
+  color: var(--muted);
+}
+
+.text-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.fonts {
+  align-items: center;
+}
+
+.font {
+  flex: none;
+  position: relative;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text);
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: inset 0 0 0 1.5px var(--surface-3);
+  transition: transform 120ms var(--ease-out), background-color 150ms ease, color 150ms ease;
+}
+
+.font::after {
+  content: '';
+  position: absolute;
+  inset: -5px -2px;
+}
+
+.font:active {
+  transform: scale(0.95);
+}
+
+.font[data-active='true'] {
+  background: var(--accent);
+  color: var(--accent-text);
+  box-shadow: none;
+}
+
 .photos {
   align-items: center;
   padding-top: 8px;
@@ -845,7 +951,7 @@ input[type='range']::-moz-range-thumb {
 
 .tabbar {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   padding: 4px 8px calc(var(--safe-bottom) + 4px);
   background: var(--surface);
 }
@@ -1065,6 +1171,20 @@ input[type='range']::-moz-range-thumb {
   .kind,
   .format {
     flex-basis: 92px;
+  }
+
+  .text-panel {
+    gap: 6px;
+  }
+
+  .text-input,
+  .font {
+    height: 28px;
+  }
+
+  .text-panel .swatch {
+    width: 26px;
+    height: 26px;
   }
 
   .thumb {

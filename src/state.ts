@@ -1,4 +1,4 @@
-import { BACKGROUNDS, emptySlot, FORMATS, PAPERS, type Photo, type Slot, type Style } from './collage'
+import { BACKGROUNDS, emptySlot, emptyText, FORMATS, PAPERS, type Photo, type Slot, type Style, type TextItem } from './collage'
 import { layoutsFor, MAX_CELLS, type Kind } from './layouts'
 
 export type State = {
@@ -12,6 +12,7 @@ export type State = {
   layoutByKey: Record<string, string>
   formatId: string
   style: Style
+  text: TextItem
 }
 
 export type Action =
@@ -22,6 +23,7 @@ export type Action =
   | { type: 'setLayout'; id: string }
   | { type: 'setFormat'; id: string }
   | { type: 'setStyle'; style: Partial<Style> }
+  | { type: 'setText'; text: Partial<TextItem> }
   | { type: 'setSlot'; index: number; slot: Partial<Slot> }
   | { type: 'assign'; index: number; photoId: string | null }
   | { type: 'swap'; a: number; b: number }
@@ -36,6 +38,7 @@ export const initialState: State = {
   layoutByKey: {},
   formatId: FORMATS[0].id,
   style: { gap: 0.012, radius: 0, bg: '#ffffff', scale: 1, tilt: 1, tape: true },
+  text: emptyText(),
 }
 
 const keyOf = (state: State) => `${state.kind}:${state.count}`
@@ -90,6 +93,8 @@ export function reducer(state: State, action: Action): State {
       return { ...state, formatId: action.id }
     case 'setStyle':
       return { ...state, style: { ...state.style, ...action.style } }
+    case 'setText':
+      return { ...state, text: { ...state.text, ...action.text } }
     case 'setSlot':
       return { ...state, slots: state.slots.map((s, i) => (i === action.index ? { ...s, ...action.slot } : s)) }
     case 'assign':
@@ -109,7 +114,9 @@ export function reducer(state: State, action: Action): State {
           ;[order[i], order[j]] = [order[j], order[i]]
         }
       } while (order.length > 1 && order.every((v, i) => v === i))
-      const shuffled = order.map((from) => ({ ...emptySlot(), photoId: visible[from].photoId }))
+      // Pan and zoom are dropped because the photo lands in a differently
+      // shaped cell, but black and white belongs to the picture, so it rides along.
+      const shuffled = order.map((from) => ({ ...emptySlot(), photoId: visible[from].photoId, bw: visible[from].bw }))
       return { ...state, slots: [...shuffled, ...state.slots.slice(state.count)] }
     }
     case 'reset':

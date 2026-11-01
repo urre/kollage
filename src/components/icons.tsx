@@ -101,3 +101,17 @@ export const ShareIcon = () => (
     <path d="M12 3.5V15M8 7.5l4-4 4 4M7 11H5.5v9.5h13V11H17" />
   </svg>
 )
+
+export const TextIcon = () => (
+  <svg {...base}>
+    <path d="M4 18.5 8.75 6h1.5L15 18.5M5.9 14.2h7.2" />
+    <path d="M20 11.4v7.1M20 11.4c-1.9 0-3.4 1.4-3.4 3.2s1.5 3.2 3.4 3.2" />
+  </svg>
+)
+
+export const ContrastIcon = () => (
+  <svg {...base}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" stroke="none" />
+  </svg>
+)

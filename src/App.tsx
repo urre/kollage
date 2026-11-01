@@ -3,20 +3,33 @@ import { FORMATS, ratioOf, type Scene } from './collage'
 import { CollageCanvas } from './components/CollageCanvas'
 import { Confirm } from './components/Confirm'
 import { ExportSheet } from './components/ExportSheet'
-import { CheckIcon, FormatIcon, LayoutIcon, PhotosIcon, ReplaceIcon, StyleIcon, SwapIcon, TrashIcon, TypeIcon } from './components/icons'
-import { FormatPanel, LayoutPanel, PhotosPanel, StylePanel, TypePanel } from './components/Panels'
+import {
+  CheckIcon,
+  ContrastIcon,
+  FormatIcon,
+  LayoutIcon,
+  PhotosIcon,
+  ReplaceIcon,
+  StyleIcon,
+  SwapIcon,
+  TextIcon,
+  TrashIcon,
+  TypeIcon,
+} from './components/icons'
+import { FormatPanel, LayoutPanel, PhotosPanel, StylePanel, TextPanel, TypePanel } from './components/Panels'
 import { Start } from './components/Start'
 import { layoutById } from './layouts'
 import { loadPhotos } from './photos'
 import { initialState, layoutIdFor, reducer } from './state'
 
-type Tab = 'type' | 'layout' | 'format' | 'style' | 'photos'
+type Tab = 'type' | 'layout' | 'format' | 'style' | 'text' | 'photos'
 
 const TABS: { id: Tab; label: string; icon: ReactNode }[] = [
   { id: 'type', label: 'Typ', icon: <TypeIcon /> },
   { id: 'layout', label: 'Layout', icon: <LayoutIcon /> },
   { id: 'format', label: 'Format', icon: <FormatIcon /> },
   { id: 'style', label: 'Stil', icon: <StyleIcon /> },
+  { id: 'text', label: 'Text', icon: <TextIcon /> },
   { id: 'photos', label: 'Bilder', icon: <PhotosIcon /> },
 ]
 
@@ -31,6 +44,7 @@ export function App() {
   const [tab, setTab] = useState<Tab>('layout')
   const [selected, setSelected] = useState<number | null>(null)
   const [swapping, setSwapping] = useState(false)
+  const [textSelected, setTextSelected] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [resetting, setResetting] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -48,8 +62,8 @@ export function App() {
 
   const photosById = useMemo(() => new Map(state.photos.map((p) => [p.id, p])), [state.photos])
   const scene: Scene | null = useMemo(
-    () => (layout ? { layout, slots: state.slots, photos: photosById, style: state.style } : null),
-    [layout, state.slots, photosById, state.style],
+    () => (layout ? { layout, slots: state.slots, photos: photosById, style: state.style, text: state.text } : null),
+    [layout, state.slots, photosById, state.style, state.text],
   )
 
   const usedAt = useMemo(() => {
@@ -76,9 +90,18 @@ export function App() {
   const deselect = () => {
     setSelected(null)
     setSwapping(false)
+    setTextSelected(false)
+  }
+
+  const onTextTap = () => {
+    setSelected(null)
+    setSwapping(false)
+    setTextSelected(true)
+    setTab('text')
   }
 
   const onTap = (index: number | null) => {
+    setTextSelected(false)
     if (index === null) return deselect()
     if (swapping && selected !== null) {
       if (index !== selected) dispatch({ type: 'swap', a: selected, b: index })
@@ -123,6 +146,8 @@ export function App() {
   }
 
   const selectedHasPhoto = selected !== null && !!state.slots[selected]?.photoId
+  // Clearing the field leaves nothing on the canvas to select, ring or drag.
+  const textActive = textSelected && state.text.value.trim().length > 0
 
   return (
     <div className="editor">
@@ -141,8 +166,11 @@ export function App() {
         ratio={ratioOf(format)}
         selected={selected}
         swapping={swapping}
+        textSelected={textActive}
         onTap={onTap}
         onSlot={(index, slot) => dispatch({ type: 'setSlot', index, slot })}
+        onText={(text) => dispatch({ type: 'setText', text })}
+        onTextTap={onTextTap}
       />
 
       <div className="context" aria-live="polite">
@@ -167,6 +195,15 @@ export function App() {
             <button className="chip" onClick={() => setSwapping(true)}>
               <SwapIcon /> Byt plats
             </button>
+            <button
+              className="chip chip-toggle"
+              data-active={state.slots[selected!].bw}
+              aria-pressed={state.slots[selected!].bw}
+              aria-label="Svartvitt"
+              onClick={() => dispatch({ type: 'setSlot', index: selected!, slot: { bw: !state.slots[selected!].bw } })}
+            >
+              <ContrastIcon />
+            </button>
             <button className="chip" onClick={() => dispatch({ type: 'assign', index: selected!, photoId: null })}>
               <TrashIcon /> Töm
             </button>
@@ -174,6 +211,8 @@ export function App() {
               <CheckIcon />
             </button>
           </div>
+        ) : textActive ? (
+          <p className="context-hint">Dra för att flytta · nyp för att ändra storlek</p>
         ) : (
           <p className="context-hint">Tryck på en bild för att ändra · dra och nyp för att justera</p>
         )}
@@ -202,6 +241,7 @@ export function App() {
         )}
         {tab === 'format' && <FormatPanel formatId={format.id} onFormat={(id) => dispatch({ type: 'setFormat', id })} />}
         {tab === 'style' && <StylePanel kind={state.kind} style={state.style} onStyle={(style) => dispatch({ type: 'setStyle', style })} />}
+        {tab === 'text' && <TextPanel text={state.text} onText={(text) => dispatch({ type: 'setText', text })} />}
         {tab === 'photos' && (
           <PhotosPanel
             photos={state.photos}

@@ -15,7 +15,7 @@ export type Split = { dir: 'row' | 'col'; parts: Part[]; weights: number[] }
 export type Part = Split | null
 
 export type Kind = 'grid' | 'polaroid' | 'scrapbook'
-export type Arrange = 'tidy' | 'scatter' | 'cascade' | 'pile' | 'zigzag'
+export type Arrange = 'single' | 'tidy' | 'scatter' | 'cascade' | 'pile' | 'zigzag'
 
 export type Layout =
   | { id: string; kind: 'grid'; count: number; root: Part }
@@ -223,6 +223,20 @@ function fitGrid(c: Ctx, hw: number, margin: number) {
   return { ...best, centers }
 }
 
+// One print, as large as the canvas allows. The photo aspect follows the
+// format, so a story gets a tall photo and a wide format a landscape one —
+// a single square print on 9:16 would leave half the page empty.
+function single(c: Ctx, spec: Spec): Print[] {
+  const canvas = c.W / c.H
+  const aspect = canvas > 1.25 ? 3 / 2 : canvas < 0.85 ? 4 / 5 : 1
+  const hw = frameHW(spec, aspect)
+  const m = c.S * 0.09
+  const fw = Math.min(c.W - 2 * m, (c.H - 2 * m) / hw) * c.scale
+  return [
+    { cx: c.W / 2, cy: c.H / 2, fw, aspect, rot: rand(c.r, -2.5, 2.5) * DEG * c.tilt, spec, tape: Math.floor(c.r() * 3) },
+  ]
+}
+
 function tidy(c: Ctx, spec: Spec): Print[] {
   const g = fitGrid(c, frameHW(spec, 1), c.S * 0.08)
   return g.centers.map((p) => ({ cx: p.x, cy: p.y, fw: g.fw * c.scale, aspect: 1, rot: 0, spec, tape: Math.floor(c.r() * 3) }))
@@ -303,6 +317,8 @@ function arrange(layout: Extract<Layout, { arrange: Arrange }>, c: Ctx): Print[]
   const spec = layout.kind === 'polaroid' ? POLAROID : PRINT
   const mixed = layout.kind === 'scrapbook'
   switch (layout.arrange) {
+    case 'single':
+      return single(c, spec)
     case 'tidy':
       return tidy(c, spec)
     case 'scatter':
@@ -363,6 +379,7 @@ type Variant = { arrange: Arrange; seed: number; min: number; max: number }
 
 const PRINT_VARIANTS: Record<'polaroid' | 'scrapbook', Variant[]> = {
   polaroid: [
+    { arrange: 'single', seed: 11, min: 1, max: 1 },
     { arrange: 'scatter', seed: 1, min: 1, max: 9 },
     { arrange: 'scatter', seed: 7, min: 2, max: 9 },
     { arrange: 'zigzag', seed: 9, min: 3, max: 9 },
@@ -371,6 +388,7 @@ const PRINT_VARIANTS: Record<'polaroid' | 'scrapbook', Variant[]> = {
     { arrange: 'tidy', seed: 2, min: 1, max: 9 },
   ],
   scrapbook: [
+    { arrange: 'single', seed: 12, min: 1, max: 1 },
     { arrange: 'zigzag', seed: 1, min: 2, max: 9 },
     { arrange: 'zigzag', seed: 4, min: 2, max: 9 },
     { arrange: 'scatter', seed: 3, min: 1, max: 9 },

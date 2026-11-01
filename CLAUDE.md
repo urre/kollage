@@ -40,15 +40,35 @@ gestures work the same on a tilted polaroid as on a grid cell.
   (tall-friendly first, since 9:16 is the default). `computeRects` splits
   `size + gap` by weight so seams line up across siblings — a `[L, 2], L`
   split aligns with two thirds of `L, L, L`. Keep that formula.
-- **Polaroid / Klippbok (prints):** arrangement functions (`tidy`, `scatter`,
-  `zigzag`, `cascade`, `pile`) place white-framed prints relative to the canvas
-  size, so they adapt to every format. Variants are listed in
+- **Polaroid / Klippbok (prints):** arrangement functions (`single`, `tidy`,
+  `scatter`, `zigzag`, `cascade`, `pile`) place white-framed prints relative to
+  the canvas size, so they adapt to every format. `single` is the one-photo
+  default: one print as large as the margins allow, with the photo aspect
+  picked from the canvas ratio, because a square print on 9:16 leaves half the
+  page empty. Variants are listed in
   `PRINT_VARIANTS` with a seed; randomness comes from a seeded PRNG and must be
   consumed the same way regardless of W/H, or a variant would look different
   in the preview and the export. `toCell` keeps rotated prints on the canvas.
   Klippbok defaults to tape (strips at the top edge or two opposite corners)
   and mixed portrait/landscape photos; inspiration was a scrapbook page and a
   polaroid wall the user shared.
+
+**The caption** (`TextItem` in `collage.ts`, the "Text" tab) is one string for
+the whole collage, drawn by `drawScene` after every cell. Position is a
+fraction of the canvas and size a fraction of the short side, like gap and
+radius, so it lands in the same place in the export. On the canvas it is its
+own gesture, ahead of the cells: drag to move, pinch to size, twist to tilt.
+`textLayout` is shared by the renderer and the hit test, so what you can grab
+is what you can see. The five faces are **system fonts**, not web fonts —
+nothing is downloaded, and iOS ships Snell Roundhand, Bradley Hand and Marker
+Felt. Android has none of them and falls back to the generics, so the same
+collage comes out in a different hand there.
+
+**Black and white** is `slot.bw`, so it belongs to the placement like zoom and
+follows the photo through a swap or a shuffle but not through a replace.
+`drawPhoto` uses `ctx.filter` where it exists and a `saturation` blend
+otherwise (Safari only got the filter in 17), rather than keeping a second
+grey copy of each 2048 px photo in memory.
 
 **Slots** are always 9 long; only the first `count` are visible. Lowering the
 count keeps the hidden slots' photos so raising it again is lossless.
