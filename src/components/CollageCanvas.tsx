@@ -1,17 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from 'react'
-import {
-  drawScene,
-  offsetFor,
-  placement,
-  sceneCells,
-  textLayout,
-  TEXT_SIZE_RANGE,
-  ZOOM_MAX,
-  type Photo,
-  type Scene,
-  type Slot,
-  type TextItem,
-} from '../collage'
+import { drawScene, offsetFor, placement, sceneCells, ZOOM_MAX, type Photo, type Scene, type Slot } from '../collage'
 import { hitArea, toLocal, type Cell, type Rect } from '../layouts'
 import { PlusIcon } from './icons'
 
@@ -20,11 +8,8 @@ type Props = {
   ratio: number
   selected: number | null
   swapping: boolean
-  textSelected: boolean
   onTap: (index: number | null) => void
   onSlot: (index: number, slot: Partial<Slot>) => void
-  onText: (text: Partial<TextItem>) => void
-  onTextTap: () => void
 }
 
 type Point = { x: number; y: number }
@@ -41,15 +26,6 @@ type Gesture = {
   // Reference values for the current phase. Re-taken whenever a finger lands
   // or lifts, so switching between one and two fingers never makes the image jump.
   start: { slot: Slot; at: Point; dist: number }
-}
-
-// The caption is dragged, pinched and twisted as one object, so it gets its
-// own gesture rather than pretending to be a cell: it has no rect in the
-// layout and lives on top of every cell.
-type TextGesture = {
-  pointers: Map<number, Point>
-  moved: boolean
-  start: { text: TextItem; at: Point; dist: number; angle: number }
 }
 
 const TAP_SLOP = 8
@@ -76,13 +52,6 @@ function spread(points: Point[]) {
   return points.length < 2 ? 0 : Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y)
 }
 
-function angleOf(points: Point[]) {
-  return points.length < 2 ? 0 : Math.atan2(points[1].y - points[0].y, points[1].x - points[0].x)
-}
-
-// Into (−π, π], so a twist past the ±π seam doesn't spin the caption around.
-const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a))
-
 // Absolutely positioned overlay for `r`, rotated with its cell.
 function boxStyle(r: Rect, cell: Cell, radius: number) {
   return {
@@ -94,13 +63,12 @@ function boxStyle(r: Rect, cell: Cell, radius: number) {
   }
 }
 
-export function CollageCanvas({ scene, ratio, selected, swapping, textSelected, onTap, onSlot, onText, onTextTap }: Props) {
+export function CollageCanvas({ scene, ratio, selected, swapping, onTap, onSlot }: Props) {
   const stageRef = useRef<HTMLDivElement>(null)
   const surfaceRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [stage, setStage] = useState({ w: 0, h: 0 })
   const gesture = useRef<Gesture | null>(null)
-  const textGesture = useRef<TextGesture | null>(null)
   const settleFrame = useRef(0)
   const sceneRef = useRef(scene)
   sceneRef.current = scene
@@ -155,40 +123,6 @@ export function CollageCanvas({ scene, ratio, selected, swapping, textSelected, 
     return { x: e.clientX - b.left, y: e.clientY - b.top }
   }
 
-  // Measured in CSS pixels: measureText only depends on ctx.font, not on the
-  // canvas's device-pixel backing size, so the same call serves the overlay
-  // and the hit test.
-  const measureText = () => {
-    const ctx = canvasRef.current?.getContext('2d')
-    return ctx && size.w > 0 ? textLayout(ctx, scene.text, size.w, size.h) : null
-  }
-
-  const textHit = (p: Point) => {
-    const m = measureText()
-    if (!m) return false
-    const cos = Math.cos(-scene.text.rot)
-    const sin = Math.sin(-scene.text.rot)
-    const dx = p.x - m.cx
-    const dy = p.y - m.cy
-    const qx = dx * cos - dy * sin
-    const qy = dx * sin + dy * cos
-    // A caption can be set tiny, so the grab area never shrinks below a finger.
-    const padX = Math.max(16, m.px * 0.25)
-    const padY = Math.max(12, m.px * 0.2)
-    return Math.abs(qx) <= m.w / 2 + padX && Math.abs(qy) <= m.h / 2 + padY
-  }
-
-  const newTextGesture = (p: Point): TextGesture => ({
-    pointers: new Map(),
-    moved: false,
-    start: { text: { ...sceneRef.current.text }, at: p, dist: 0, angle: 0 },
-  })
-
-  const restartTextPhase = (g: TextGesture) => {
-    const pts = [...g.pointers.values()]
-    g.start = { text: { ...sceneRef.current.text }, at: centroid(pts), dist: spread(pts), angle: angleOf(pts) }
-  }
-
   // Topmost first: later cells are drawn over earlier ones.
   const hit = (p: Point) => {
     for (let i = cells.length - 1; i >= 0; i--) {
@@ -230,20 +164,6 @@ export function CollageCanvas({ scene, ratio, selected, swapping, textSelected, 
 
   const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
     const p = localPoint(e)
-
-    // The caption sits above every cell, so it gets first refusal on a touch.
-    const tg = textGesture.current ?? (!gesture.current && textHit(p) ? newTextGesture(p) : null)
-    if (tg) {
-      textGesture.current = tg
-      // A third finger would make the pinch jump; ignore it.
-      if (tg.pointers.size >= 2) return
-      e.currentTarget.setPointerCapture(e.pointerId)
-      tg.pointers.set(e.pointerId, p)
-      if (tg.pointers.size === 2) tg.moved = true
-      restartTextPhase(tg)
-      return
-    }
-
     let g = gesture.current
     if (!g) {
       const cell = hit(p)
@@ -272,30 +192,6 @@ export function CollageCanvas({ scene, ratio, selected, swapping, textSelected, 
   }
 
   const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
-    const tg = textGesture.current
-    if (tg?.pointers.has(e.pointerId)) {
-      tg.pointers.set(e.pointerId, localPoint(e))
-      const pts = [...tg.pointers.values()]
-      const at = centroid(pts)
-      if (!tg.moved) {
-        if (Math.hypot(at.x - tg.start.at.x, at.y - tg.start.at.y) < TAP_SLOP) return
-        tg.moved = true
-        restartTextPhase(tg)
-        return
-      }
-      const st = tg.start
-      const patch: Partial<TextItem> = {
-        x: clamp(st.text.x + (at.x - st.at.x) / Math.max(size.w, 1), 0, 1),
-        y: clamp(st.text.y + (at.y - st.at.y) / Math.max(size.h, 1), 0, 1),
-      }
-      if (pts.length === 2) {
-        patch.size = clamp((st.text.size * spread(pts)) / Math.max(st.dist, 1), TEXT_SIZE_RANGE[0], TEXT_SIZE_RANGE[1])
-        patch.rot = st.text.rot + wrap(angleOf(pts) - st.angle)
-      }
-      onText(patch)
-      return
-    }
-
     const g = gesture.current
     if (!g || !g.pointers.has(e.pointerId)) return
     const p = localPoint(e)
@@ -334,14 +230,6 @@ export function CollageCanvas({ scene, ratio, selected, swapping, textSelected, 
   }
 
   const onPointerEnd = (e: PointerEvent<HTMLDivElement>) => {
-    const tg = textGesture.current
-    if (tg?.pointers.delete(e.pointerId)) {
-      if (tg.pointers.size > 0) return restartTextPhase(tg)
-      textGesture.current = null
-      if (!tg.moved) onTextTap()
-      return
-    }
-
     const g = gesture.current
     if (!g || !g.pointers.delete(e.pointerId)) return
     if (g.pointers.size > 0) {
@@ -354,7 +242,6 @@ export function CollageCanvas({ scene, ratio, selected, swapping, textSelected, 
   }
 
   const ringCell = selected !== null ? cells[selected] : undefined
-  const textRing = textSelected ? measureText() : null
 
   return (
     <div className="stage" ref={stageRef} onPointerDown={(e) => e.target === e.currentTarget && onTap(null)}>
@@ -377,17 +264,6 @@ export function CollageCanvas({ scene, ratio, selected, swapping, textSelected, 
         )}
         {ringCell && (
           <div className={`ring${swapping ? ' ring-swap' : ''}`} style={boxStyle(hitArea(ringCell), ringCell, radius)} />
-        )}
-        {textRing && (
-          <div
-            className="ring ring-text"
-            style={{
-              width: textRing.w + 20,
-              height: textRing.h + 12,
-              transform: `translate(${textRing.cx - textRing.w / 2 - 10}px, ${textRing.cy - textRing.h / 2 - 6}px) rotate(${scene.text.rot}rad)`,
-              transformOrigin: `${textRing.w / 2 + 10}px ${textRing.h / 2 + 6}px`,
-            }}
-          />
         )}
       </div>
     </div>

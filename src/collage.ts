@@ -19,33 +19,6 @@ export type Slot = { photoId: string | null; zoom: number; ox: number; oy: numbe
 // only apply to the print kinds (polaroid, scrapbook).
 export type Style = { gap: number; radius: number; bg: string; scale: number; tilt: number; tape: boolean }
 
-export type FontId = 'sans' | 'serif' | 'script' | 'brush' | 'marker'
-
-// System faces, not web fonts: nothing is downloaded and nothing is fetched at
-// runtime, which keeps the app a single self-contained page. iOS and macOS
-// ship all five. Android has none of them and falls back to the generic at the
-// end of each stack, so the same collage can come out in a different hand there.
-// `scale` evens out how small the script and brush faces draw at a given px.
-export const FONTS: { id: FontId; label: string; stack: string; weight: number; scale: number }[] = [
-  { id: 'script', label: 'Skrivstil', stack: '"Snell Roundhand", "Apple Chancery", "Brush Script MT", cursive', weight: 700, scale: 1.35 },
-  { id: 'brush', label: 'Pensel', stack: '"Bradley Hand", "Segoe Script", "Comic Sans MS", cursive', weight: 700, scale: 1.1 },
-  { id: 'marker', label: 'Tusch', stack: '"Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive', weight: 400, scale: 1.1 },
-  { id: 'sans', label: 'Ren', stack: '-apple-system, "Helvetica Neue", system-ui, sans-serif', weight: 600, scale: 1 },
-  { id: 'serif', label: 'Antikva', stack: '"Hoefler Text", Georgia, "Times New Roman", serif', weight: 600, scale: 1 },
-]
-
-export const fontOf = (id: FontId) => FONTS.find((f) => f.id === id) ?? FONTS[0]
-
-export const TEXT_COLORS = ['#ffffff', '#1c1c1e', '#b23a2f', '#1f4e79', '#c9a227', '#3f6b4a']
-
-export const TEXT_SIZE_RANGE = [0.025, 0.28] as const
-
-// x/y are fractions of the canvas and size a fraction of the short side, so the
-// caption lands in the same place in the 2160 px export as in the preview.
-export type TextItem = { value: string; font: FontId; size: number; color: string; x: number; y: number; rot: number }
-
-export const emptyText = (): TextItem => ({ value: '', font: 'script', size: 0.085, color: '#ffffff', x: 0.5, y: 0.88, rot: 0 })
-
 export type Format = { id: string; label: string; hint: string; size: [number, number] }
 
 // The first format is the default.
@@ -76,7 +49,6 @@ export type Scene = {
   slots: Slot[]
   photos: Map<string, Photo>
   style: Style
-  text: TextItem
 }
 
 export function sceneCells(scene: Scene, W: number, H: number): Cell[] {
@@ -199,41 +171,6 @@ function drawPhoto(ctx: CanvasRenderingContext2D, photo: Photo, p: Rect, cell: R
   ctx.globalCompositeOperation = 'source-over'
 }
 
-// Where the caption sits and how big it is, in canvas units. Shared by the
-// renderer and the canvas's hit-testing so the box you can grab is the box
-// you can see. Returns null when there is nothing to draw.
-export function textLayout(ctx: CanvasRenderingContext2D, t: TextItem, W: number, H: number) {
-  const lines = t.value.split('\n')
-  if (!t.value.trim()) return null
-  const font = fontOf(t.font)
-  const px = t.size * Math.min(W, H) * font.scale
-  ctx.save()
-  ctx.font = `${font.weight} ${px}px ${font.stack}`
-  const w = Math.max(...lines.map((l) => ctx.measureText(l).width))
-  ctx.restore()
-  const lh = px * 1.15
-  return { font, px, lines, lh, w, h: lh * lines.length, cx: t.x * W, cy: t.y * H }
-}
-
-function drawText(ctx: CanvasRenderingContext2D, t: TextItem, W: number, H: number) {
-  const m = textLayout(ctx, t, W, H)
-  if (!m) return
-  ctx.save()
-  ctx.translate(m.cx, m.cy)
-  ctx.rotate(t.rot)
-  ctx.font = `${m.font.weight} ${m.px}px ${m.font.stack}`
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.fillStyle = t.color
-  // Just enough shadow to keep a caption readable wherever it is dragged;
-  // any heavier and it stops looking like ink on the picture.
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.3)'
-  ctx.shadowBlur = m.px * 0.14
-  ctx.shadowOffsetY = m.px * 0.03
-  m.lines.forEach((line, i) => ctx.fillText(line, 0, (i - (m.lines.length - 1) / 2) * m.lh))
-  ctx.restore()
-}
-
 export function drawScene(ctx: CanvasRenderingContext2D, W: number, H: number, scene: Scene) {
   const prints = scene.layout.kind !== 'grid'
   const radius = prints ? 0 : scene.style.radius * Math.min(W, H)
@@ -278,8 +215,6 @@ export function drawScene(ctx: CanvasRenderingContext2D, W: number, H: number, s
     c.tape?.forEach((t) => drawTape(ctx, t))
     ctx.restore()
   })
-
-  drawText(ctx, scene.text, W, H)
 }
 
 export function renderToBlob(scene: Scene, format: Format, type: 'image/png' | 'image/jpeg'): Promise<Blob> {

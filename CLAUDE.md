@@ -53,17 +53,6 @@ gestures work the same on a tilted polaroid as on a grid cell.
   and mixed portrait/landscape photos; inspiration was a scrapbook page and a
   polaroid wall the user shared.
 
-**The caption** (`TextItem` in `collage.ts`, the "Text" tab) is one string for
-the whole collage, drawn by `drawScene` after every cell. Position is a
-fraction of the canvas and size a fraction of the short side, like gap and
-radius, so it lands in the same place in the export. On the canvas it is its
-own gesture, ahead of the cells: drag to move, pinch to size, twist to tilt.
-`textLayout` is shared by the renderer and the hit test, so what you can grab
-is what you can see. The five faces are **system fonts**, not web fonts —
-nothing is downloaded, and iOS ships Snell Roundhand, Bradley Hand and Marker
-Felt. Android has none of them and falls back to the generics, so the same
-collage comes out in a different hand there.
-
 **Black and white** is `slot.bw`, so it belongs to the placement like zoom and
 follows the photo through a swap or a shuffle but not through a replace.
 `drawPhoto` uses `ctx.filter` where it exists and a `saturation` blend

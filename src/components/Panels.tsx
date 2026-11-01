@@ -1,18 +1,15 @@
 import {
   BACKGROUNDS,
-  FONTS,
   FORMATS,
   GAP_MAX,
   PAPERS,
   RADIUS_MAX,
   ratioOf,
   SCALE_RANGE,
-  TEXT_COLORS,
   TILT_MAX,
   type Format,
   type Photo,
   type Style,
-  type TextItem,
 } from '../collage'
 import { cellsFor, KINDS, layoutsFor, MAX_CELLS, type Kind, type Layout } from '../layouts'
 import { CloseIcon, PlusIcon, ShuffleIcon } from './icons'
@@ -197,55 +194,6 @@ export function StylePanel({ kind, style, onStyle }: { kind: Kind; style: Style;
             data-active={bg === style.bg}
             style={{ background: bg }}
             onClick={() => onStyle({ bg })}
-          />
-        ))}
-      </div>
-    </div>
-  )
-}
-
-export function TextPanel({ text, onText }: { text: TextItem; onText: (t: Partial<TextItem>) => void }) {
-  return (
-    <div className="panel-stack text-panel">
-      <input
-        className="text-input"
-        type="text"
-        value={text.value}
-        placeholder="Skriv något på kollaget…"
-        aria-label="Text på kollaget"
-        enterKeyHint="done"
-        autoCorrect="off"
-        spellCheck={false}
-        onChange={(e) => onText({ value: e.target.value })}
-        onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-      />
-      <div className="scroller fonts" role="radiogroup" aria-label="Typsnitt">
-        {FONTS.map((f) => (
-          <button
-            key={f.id}
-            role="radio"
-            aria-checked={f.id === text.font}
-            className="font"
-            data-active={f.id === text.font}
-            // Each button is set in the face it picks, which says more than a name.
-            style={{ fontFamily: f.stack, fontWeight: f.weight, fontSize: 15 * f.scale }}
-            onClick={() => onText({ font: f.id })}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
-      <div className="swatches" role="radiogroup" aria-label="Textfärg">
-        {TEXT_COLORS.map((c) => (
-          <button
-            key={c}
-            role="radio"
-            aria-checked={c === text.color}
-            aria-label={`Textfärg ${c}`}
-            className="swatch"
-            data-active={c === text.color}
-            style={{ background: c }}
-            onClick={() => onText({ color: c })}
           />
         ))}
       </div>
