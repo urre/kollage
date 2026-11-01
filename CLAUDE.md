@@ -20,6 +20,7 @@ npm run build       # typecheck + vite build → dist/
 | [src/state.ts](src/state.ts) | Reducer: photos, 9 slots, count, kind, layout per kind+count, format, style |
 | [src/photos.ts](src/photos.ts) | File → downscaled canvas + thumbnail |
 | [src/components/CollageCanvas.tsx](src/components/CollageCanvas.tsx) | Preview canvas + tap / pan / pinch gestures |
+| [src/components/Sheet.tsx](src/components/Sheet.tsx) | Bottom sheet shell: scrim, in/ut, drag-att-stänga — bärs av export och Confirm |
 | [server/serve.mjs](server/serve.mjs) | Zero-dependency static server + Bonjour name (production only) |
 
 **WYSIWYG is the core invariant.** The preview and the export both go through

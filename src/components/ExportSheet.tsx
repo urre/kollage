@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { renderToBlob, type Format, type Scene } from '../collage'
-import { CloseIcon, DownloadIcon, ShareIcon } from './icons'
+import { DownloadIcon, ShareIcon } from './icons'
+import { Sheet } from './Sheet'
 
 type Kind = 'jpg' | 'png'
 // url (blob:) backs the download link; preview (data:) backs the <img>.
@@ -22,8 +23,6 @@ const KINDS: { id: Kind; label: string; hint: string; mime: 'image/jpeg' | 'imag
   { id: 'png', label: 'PNG', hint: 'Bäst kvalitet', mime: 'image/png' },
 ]
 
-const EXIT_MS = 200
-
 function fileName(kind: Kind) {
   const d = new Date()
   const pad = (n: number) => String(n).padStart(2, '0')
@@ -35,26 +34,8 @@ export function ExportSheet({ scene, format, empty, onClose }: { scene: Scene; f
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<Result | null>(null)
-  const [open, setOpen] = useState(false)
-
-  // Mount closed, then open on the next frame so the transition has a start.
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setOpen(true))
-    return () => cancelAnimationFrame(id)
-  }, [])
 
   useEffect(() => () => void (result && URL.revokeObjectURL(result.url)), [result])
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  })
-
-  const close = () => {
-    setOpen(false)
-    setTimeout(onClose, EXIT_MS)
-  }
 
   const pickKind = (k: Kind) => {
     if (k === kind) return
@@ -94,72 +75,66 @@ export function ExportSheet({ scene, format, empty, onClose }: { scene: Scene; f
   const [W, H] = format.size
 
   return (
-    <div className="sheet-root" data-open={open}>
-      <div className="scrim" onClick={close} />
-      <div className="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
-        <div className="sheet-head">
-          <h2 id="sheet-title">Spara kollage</h2>
-          <button className="icon-btn" onClick={close} aria-label="Stäng">
-            <CloseIcon />
-          </button>
-        </div>
-
-        <div className="segmented" role="radiogroup" aria-label="Filformat">
-          {KINDS.map((k) => (
-            <button key={k.id} role="radio" aria-checked={k.id === kind} data-active={k.id === kind} onClick={() => pickKind(k.id)}>
-              <strong>{k.label}</strong>
-              <span>{k.hint}</span>
-            </button>
-          ))}
-        </div>
-
-        {result ? (
-          <div className="result">
-            <img src={result.preview} alt="Ditt kollage" className="result-img" />
-            <p className="result-how">
-              Håll fingret på bilden och välj <strong>Lägg till i Bilder</strong>
-              <span className="muted"> (Android: Ladda ned bild)</span>
-            </p>
-            <p className="muted">
-              {W} × {H} px · {(result.file.size / 1e6).toFixed(1)} MB
-            </p>
+    <Sheet title="Spara kollage" onClose={onClose}>
+      {() => (
+        <>
+          <div className="segmented" role="radiogroup" aria-label="Filformat">
+            {KINDS.map((k) => (
+              <button key={k.id} role="radio" aria-checked={k.id === kind} data-active={k.id === kind} onClick={() => pickKind(k.id)}>
+                <strong>{k.label}</strong>
+                <span>{k.hint}</span>
+              </button>
+            ))}
           </div>
-        ) : (
-          <p className="muted sheet-note">
-            {W} × {H} px. Bilden skapas i telefonen och laddas aldrig upp.
-          </p>
-        )}
 
-        {empty > 0 && (
-          <p className="muted sheet-note">
-            {empty === 1 ? 'En ruta är tom' : `${empty} rutor är tomma`} och blir bakgrund i bilden.
-          </p>
-        )}
-
-        {error && <p className="error">{error}</p>}
-
-        <div className="sheet-actions">
           {result ? (
-            <>
-              <a className="btn btn-secondary" href={result.url} download={result.file.name}>
-                <DownloadIcon />
-                Spara som fil
-              </a>
-              {canShare && (
-                <button className="btn btn-secondary" onClick={share}>
-                  <ShareIcon />
-                  Dela
-                </button>
-              )}
-            </>
+            <div className="result">
+              <img src={result.preview} alt="Ditt kollage" className="result-img" />
+              <p className="result-how">
+                Håll fingret på bilden och välj <strong>Lägg till i Bilder</strong>
+                <span className="muted"> (Android: Ladda ned bild)</span>
+              </p>
+              <p className="muted">
+                {W} × {H} px · {(result.file.size / 1e6).toFixed(1)} MB
+              </p>
+            </div>
           ) : (
-            <button className="btn btn-primary" onClick={create} disabled={busy}>
-              {busy ? <span className="spinner" /> : <DownloadIcon />}
-              {busy ? 'Skapar bild…' : `Skapa ${kind.toUpperCase()}`}
-            </button>
+            <p className="muted sheet-note">
+              {W} × {H} px. Bilden skapas i telefonen och laddas aldrig upp.
+            </p>
           )}
-        </div>
-      </div>
-    </div>
+
+          {empty > 0 && (
+            <p className="muted sheet-note">
+              {empty === 1 ? 'En ruta är tom' : `${empty} rutor är tomma`} och blir bakgrund i bilden.
+            </p>
+          )}
+
+          {error && <p className="error">{error}</p>}
+
+          <div className="sheet-actions">
+            {result ? (
+              <>
+                <a className="btn btn-secondary" href={result.url} download={result.file.name}>
+                  <DownloadIcon />
+                  Spara som fil
+                </a>
+                {canShare && (
+                  <button className="btn btn-secondary" onClick={share}>
+                    <ShareIcon />
+                    Dela
+                  </button>
+                )}
+              </>
+            ) : (
+              <button className="btn btn-primary" onClick={create} disabled={busy}>
+                {busy ? <span className="spinner" /> : <DownloadIcon />}
+                {busy ? 'Skapar bild…' : `Skapa ${kind.toUpperCase()}`}
+              </button>
+            )}
+          </div>
+        </>
+      )}
+    </Sheet>
   )
 }

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react'
 import { FORMATS, ratioOf, type Scene } from './collage'
 import { CollageCanvas } from './components/CollageCanvas'
+import { Confirm } from './components/Confirm'
 import { ExportSheet } from './components/ExportSheet'
 import { CheckIcon, FormatIcon, LayoutIcon, PhotosIcon, ReplaceIcon, StyleIcon, SwapIcon, TrashIcon, TypeIcon } from './components/icons'
 import { FormatPanel, LayoutPanel, PhotosPanel, StylePanel, TypePanel } from './components/Panels'
@@ -31,6 +32,7 @@ export function App() {
   const [selected, setSelected] = useState<number | null>(null)
   const [swapping, setSwapping] = useState(false)
   const [exporting, setExporting] = useState(false)
+  const [resetting, setResetting] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const pickTarget = useRef<number | undefined>(undefined)
 
@@ -102,7 +104,6 @@ export function App() {
   }
 
   const reset = () => {
-    if (!window.confirm('Börja om? Kollaget försvinner.')) return
     deselect()
     setTab('layout')
     dispatch({ type: 'reset' })
@@ -126,7 +127,7 @@ export function App() {
   return (
     <div className="editor">
       <header className="topbar">
-        <button className="btn-text" onClick={reset}>
+        <button className="btn-text" onClick={() => setResetting(true)}>
           Börja om
         </button>
         <span className="wordmark">Mollage</span>
@@ -223,6 +224,15 @@ export function App() {
         ))}
       </nav>
 
+      {resetting && (
+        <Confirm
+          title="Börja om?"
+          body="Kollaget töms och alla valda bilder försvinner."
+          confirmLabel="Börja om"
+          onConfirm={reset}
+          onClose={() => setResetting(false)}
+        />
+      )}
       {exporting && (
         <ExportSheet
           scene={scene}

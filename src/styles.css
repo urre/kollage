@@ -133,6 +133,11 @@ svg {
   background: var(--surface-2);
 }
 
+.btn-danger {
+  background: var(--danger);
+  color: #2b0a08;
+}
+
 .btn-large {
   width: 100%;
   height: 58px;
@@ -895,7 +900,7 @@ input[type='range']::-moz-range-thumb {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 18px var(--pad-right) calc(var(--safe-bottom) + 16px) var(--pad-left);
+  padding: 10px var(--pad-right) calc(var(--safe-bottom) + 16px) var(--pad-left);
   border-radius: 24px 24px 0 0;
   max-height: calc(100dvh - var(--safe-top) - 12px);
   overflow-y: auto;
@@ -905,6 +910,37 @@ input[type='range']::-moz-range-thumb {
   transform: translateY(100%);
   /* Exit: short. The open state below sets the longer enter transition. */
   transition: transform 200ms var(--ease-drawer);
+}
+
+.sheet[data-dragging='true'] {
+  transition: none;
+}
+
+/* The whole header is the drag surface, so the body keeps its own scroll.
+   The negative margin pulls it out to the sheet's own edges, so the top strip
+   above the grabber drags too. */
+.sheet-grip {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: -10px calc(-1 * var(--pad-right)) 0 calc(-1 * var(--pad-left));
+  padding: 10px var(--pad-right) 0 var(--pad-left);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+
+.sheet-grip:active {
+  cursor: grabbing;
+}
+
+.sheet-grabber {
+  align-self: center;
+  width: 38px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--surface-3);
 }
 
 .sheet-root[data-open='true'] .scrim {
