@@ -120,12 +120,13 @@ hand. The sources are in [docs/card/](docs/card/): `og.html` and `hero.html`
 share `card.css`, and both expect two phone screenshots named `shot-grid.png`
 and `shot-klippbok.png` beside them.
 
-To redo them: run the dev server, open the app in headless Chrome at
-`375x812` with `--force-device-scale-factor=3`, run
-[docs/card/demo-photos.js](docs/card/demo-photos.js) in the page (it generates
-four stand-in landscapes and drops them into the file input, so no real
-photos end up in a public repo), screenshot one grid and one scrapbook
-collage into `docs/card/`, then screenshot the two cards at 2× and downscale:
+To redo them: run the dev server, open the app at `375x812` with a device
+pixel ratio of 3, load [docs/card/fill-app.js](docs/card/fill-app.js) and call
+`fillApp(window, { kind, layout })`. It fills the collage with solid blocks in
+the icon's four colours — yellow, paper white, grey, near-black — so the cards
+show the app's shapes instead of stand-in photos, and no real pictures end up
+in a public repo. Screenshot one grid and one scrapbook collage into
+`docs/card/`, then screenshot the two cards at 2× and downscale:
 
 ```bash
 chrome --headless=new --screenshot=og.png --window-size=1200,630 \
