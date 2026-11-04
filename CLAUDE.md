@@ -9,7 +9,7 @@ Default format is **9:16 (Story)**. All UI text is **Swedish**.
 npm run dev         # vite --host on port 5180 — open on the phone via this Mac's LAN IP
 npm run typecheck
 npm run build       # typecheck + vite build → dist/
-vercel --prod       # deploy (see below)
+git push            # deploys (see below)
 ```
 
 ## How it fits together
@@ -90,29 +90,24 @@ constantly (tab switches, layout changes), `prefers-reduced-motion` respected.
 
 ## Deploy
 
-**URL: [kollage-app.vercel.app](https://kollage-app.vercel.app)** — the
-Vercel project is `kollage`; both `kollage.vercel.app` and `mollage.vercel.app`
-belong to strangers, since that namespace is global. Nothing to keep alive: no
-server process, no launchd, no LAN.
+**URL: [urre.github.io/kollage](https://urre.github.io/kollage/)** — GitHub
+Pages, built by [.github/workflows/pages.yml](.github/workflows/pages.yml) on
+every push to `main`. Nothing to keep alive: no server process, no launchd, no
+LAN, no Vercel account.
 
-The project is connected to [github.com/urre/mollage](https://github.com/urre/mollage)
-(private, still the old repo name) with `main` as the production branch, so
-**a push deploys** and every other branch gets a preview URL. `vercel.json`
-pins the framework and `dist/` so the build does not depend on autodetection.
-To deploy from here instead:
+Pages serves the repo under `/kollage/`, not at the domain root, so
+`vite.config.ts` sets `base: '/kollage/'` — in dev too, so a path that works
+locally works in production. The dev server redirects `/` there, so the bare
+LAN IP still opens the app on the phone. Rename the repo and that base has to
+change with it, or every asset 404s.
 
-```bash
-vercel --prod
-```
+The build is `npm run build`, which typechecks first, so a type error fails the
+deploy the same way it fails locally. There is no preview environment: a branch
+is just a branch until it is merged into `main`.
 
-Deployment Protection covers the generated deployment URLs
-(`kollage-<hash>-urban-sandens-projects.vercel.app` answers 302 to Vercel's
-login) but not the production domain, which is public. If a phone ever gets a
-login screen, check which of the two URLs it is on — and note that a project
-with *no* domain attached leaves only the protected URLs, so the app is behind
-the login wall until one is added back.
-
-The app is still **entirely client-side** — Vercel serves static files and
+The repo is public ([github.com/urre/kollage](https://github.com/urre/kollage))
+because free Pages requires it. That is only the source — there are no keys to
+leak, since the app is **entirely client-side**: Pages serves static files and
 there is no backend, no API route, no storage. Photos are read, drawn and
 exported in the browser and never leave the phone. Keep it that way: an API
 route would turn a private app into one that handles other people's pictures.
