@@ -112,21 +112,21 @@ there is no backend, no API route, no storage. Photos are read, drawn and
 exported in the browser and never leave the phone. Keep it that way: an API
 route would turn a private app into one that handles other people's pictures.
 
-## Share image and README shot
+## Share image
 
-`public/og.jpg` (1200×630, linked from the Open Graph and Twitter tags in
-`index.html`) and `docs/hero.jpg` (the README image) are rendered, not drawn by
-hand. The sources are in [docs/card/](docs/card/): `og.html` and `hero.html`
-share `card.css`, and both expect two phone screenshots named `shot-grid.png`
-and `shot-klippbok.png` beside them.
+`public/og.jpg` (1200×630) is both the Open Graph / Twitter image linked from
+`index.html` and the picture at the top of the README — one card, so there is
+only one thing to keep current. It is rendered, not drawn by hand: the source
+is [docs/card/og.html](docs/card/og.html) with `card.css`, and it expects two
+phone screenshots named `shot-grid.png` and `shot-klippbok.png` beside it.
 
-To redo them: run the dev server, open the app at `375x812` with a device
-pixel ratio of 3, load [docs/card/fill-app.js](docs/card/fill-app.js) and call
+To redo it: run the dev server, open the app at `375x812` with a device pixel
+ratio of 3, load [docs/card/fill-app.js](docs/card/fill-app.js) and call
 `fillApp(window, { kind, layout })`. It fills the collage with solid blocks in
-the icon's four colours — yellow, paper white, grey, near-black — so the cards
-show the app's shapes instead of stand-in photos, and no real pictures end up
+the icon's four colours — yellow, paper white, grey, near-black — so the card
+shows the app's shapes instead of stand-in photos, and no real pictures end up
 in a public repo. Screenshot one grid and one scrapbook collage into
-`docs/card/`, then screenshot the two cards at 2× and downscale:
+`docs/card/`, then screenshot the card at 2× and downscale:
 
 ```bash
 chrome --headless=new --screenshot=og.png --window-size=1200,630 \

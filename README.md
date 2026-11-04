@@ -4,7 +4,7 @@ Gör kollage av dina bilder, direkt i mobilen.
 
 **[urre.github.io/kollage](https://urre.github.io/kollage/)**
 
-![Kollage på två telefoner: till vänster ett rutnät med fyra bilder, till höger en klippbokssida med tejpade kort](docs/hero.jpg)
+![Kollage: rubriken "Gör kollage i mobilen" bredvid två telefoner som visar ett rutnät och en klippbokssida i gult, vitt, grått och svart](public/og.jpg)
 
 Välj bilder, bestäm hur många rutor och vilken layout, dra och nyp varje bild
 på plats, spara som PNG eller JPG — eller dela direkt till Bilder.
