@@ -59,7 +59,7 @@ function boxStyle(r: Rect, cell: Cell, radius: number) {
     height: r.h,
     transform: `translate(${r.x}px, ${r.y}px)${cell.rot ? ` rotate(${cell.rot}rad)` : ''}`,
     transformOrigin: `${cell.px - r.x}px ${cell.py - r.y}px`,
-    borderRadius: Math.min(radius, r.w / 2, r.h / 2),
+    borderRadius: cell.round ? '50%' : Math.min(radius, r.w / 2, r.h / 2),
   }
 }
 

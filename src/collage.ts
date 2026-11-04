@@ -201,7 +201,14 @@ export function drawScene(ctx: CanvasRenderingContext2D, W: number, H: number, s
       ctx.restore()
     }
     ctx.save()
-    roundedRect(ctx, c, radius)
+    if (c.round) {
+      // A circle, not a rounded rect: the cell is already the centred square
+      // of its slot, so this matches the DOM overlay's border-radius: 50%.
+      ctx.beginPath()
+      ctx.ellipse(c.x + c.w / 2, c.y + c.h / 2, c.w / 2, c.h / 2, 0, 0, Math.PI * 2)
+    } else {
+      roundedRect(ctx, c, radius)
+    }
     ctx.clip()
     const p = placement(photo, c, slot)
     drawPhoto(ctx, photo, p, c, slot.bw)

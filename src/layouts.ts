@@ -12,10 +12,16 @@
 
 export type Rect = { x: number; y: number; w: number; h: number }
 export type Split = { dir: 'row' | 'col'; parts: Part[]; weights: number[] }
-export type Part = Split | null
+// A leaf is one photo cell: `null` fills its rectangle, `O` is a circle
+// inscribed in it. One shared value, so a tree marks a round cell with `O`.
+export const O = { round: true } as const
+export type Leaf = null | typeof O
+export type Part = Split | Leaf
+
+const isSplit = (p: Part): p is Split => p !== null && 'dir' in p
 
 export type Kind = 'grid' | 'polaroid' | 'scrapbook'
-export type Arrange = 'single' | 'tidy' | 'scatter' | 'cascade' | 'pile' | 'zigzag'
+export type Arrange = 'single' | 'tidy' | 'scatter' | 'cascade' | 'pile' | 'zigzag' | 'hero'
 
 export type Layout =
   | { id: string; kind: 'grid'; count: number; root: Part }
@@ -26,7 +32,7 @@ export type Tape = { x: number; y: number; w: number; h: number; rot: number }
 // x/y/w/h is the photo area in the cell's own unrotated space; the cell is
 // rotated by `rot` around (px, py). `frame` is the white print around the
 // photo (also the hit area); `tape` strips sit on top of it.
-export type Cell = Rect & { rot: number; px: number; py: number; frame?: Rect; tape?: Tape[] }
+export type Cell = Rect & { rot: number; px: number; py: number; round?: boolean; frame?: Rect; tape?: Tape[] }
 
 export type CellOptions = { gap: number; scale: number; tilt: number; tape: boolean }
 
@@ -65,7 +71,7 @@ const strip = (dir: Split['dir'], n: number) => split(dir, Array<Arg>(n).fill(L)
 const grid = (cols: number, rows: number) => col(...Array<Arg>(rows).fill(strip('row', cols)))
 
 function countCells(p: Part): number {
-  return p === null ? 1 : p.parts.reduce((n, c) => n + countCells(c), 0)
+  return isSplit(p) ? p.parts.reduce((n, c) => n + countCells(c), 0) : 1
 }
 
 // Order within a count is the order shown in the picker; the first is the
@@ -108,6 +114,7 @@ const TREES: Part[] = [
   row(col([L, 1.3], L), col(L, L, L)),
   col(row(L, L, L), row(L, L)),
   row(col(L, L), [L, 1.4], col(L, L)),
+  col(row(L, L), [L, 2.4], row(L, L)),
   // 6
   grid(2, 3),
   row(col([L, 3], [L, 2], [L, 3]), col([L, 2], [L, 3], [L, 2])),
@@ -116,6 +123,8 @@ const TREES: Part[] = [
   row(col(L, L), col(L, L, L, L)),
   col([row([L, 2], col(L, L)), 2], row(L, L, L)),
   grid(3, 2),
+  row(col(L, [L, 1.4], L), [col([L, 1.5], [L, 1.3], L), 1.6]),
+  col(row(L, L), [row([O, 2.6], L), 2.2], row(L, L)),
   // 7
   col(row(L, L), row(L, L, L), row(L, L)),
   col([L, 1.6], row(L, L, L), row(L, L, L)),
@@ -131,6 +140,7 @@ const TREES: Part[] = [
   col([row([L, 3], col(L, L, L)), 3], row(L, L, L, L)),
   col(row(L, L, L), row(L, L), row(L, L, L)),
   grid(4, 2),
+  row(col(L, L, L), [col([L, 2], L), 1.5], col(L, L, L)),
   // 9
   grid(3, 3),
   col([L, 1.6], grid(2, 4)),
@@ -143,11 +153,18 @@ const TREES: Part[] = [
 // Splits `size + gap` by weight and takes the gap back off each part. That keeps
 // seams aligned across siblings: a 2:1 split lines up with two thirds of a
 // 1:1:1 split, whatever the gap.
-export function computeRects(root: Part, W: number, H: number, gap: number): Rect[] {
-  const out: Rect[] = []
+export function computeRects(root: Part, W: number, H: number, gap: number): (Rect & { round?: boolean })[] {
+  const out: (Rect & { round?: boolean })[] = []
   const walk = (p: Part, r: Rect) => {
-    if (p === null) {
-      out.push(r)
+    if (!isSplit(p)) {
+      // A round cell shrinks to the centred square of its rectangle, so it is
+      // a circle in every format instead of an oval that follows the ratio.
+      if (p === O) {
+        const d = Math.min(r.w, r.h)
+        out.push({ x: r.x + (r.w - d) / 2, y: r.y + (r.h - d) / 2, w: d, h: d, round: true })
+      } else {
+        out.push(r)
+      }
       return
     }
     const total = p.weights.reduce((a, b) => a + b, 0)
@@ -313,6 +330,35 @@ function zigzag(c: Ctx, spec: Spec, flip: number, mixed: boolean): Print[] {
   })
 }
 
+// One print blown up in the middle with the rest tucked above and below, the
+// way a scrapbook page gets built around a favourite.
+function hero(c: Ctx, spec: Spec, mixed: boolean): Print[] {
+  const rest = c.n - 1
+  const rows = [Math.ceil(rest / 2), Math.floor(rest / 2)]
+  const bigAspect = mixed ? 4 / 5 : 1
+  const bigW = Math.min(c.W * 0.64, (c.H * (rest ? 0.44 : 0.78)) / frameHW(spec, bigAspect)) * c.scale
+  const smallW = Math.min(c.W * 0.3, (c.H * 0.2) / frameHW(spec, 1)) * c.scale
+  const out: Print[] = [
+    { cx: c.W / 2, cy: c.H / 2, fw: bigW, aspect: bigAspect, rot: rand(c.r, -3, 3) * DEG * c.tilt, spec, tape: Math.floor(c.r() * 3) },
+  ]
+  // The loops only depend on n, so a variant draws the same numbers from the
+  // PRNG whatever the format — the preview and the export cannot drift apart.
+  rows.forEach((n, row) => {
+    for (let i = 0; i < n; i++) {
+      out.push({
+        cx: (c.W * (i + 1)) / (n + 1) + rand(c.r, -0.03, 0.03) * c.W,
+        cy: c.H * (row === 0 ? 0.17 : 0.83) + rand(c.r, -0.02, 0.02) * c.H,
+        fw: smallW,
+        aspect: 1,
+        rot: sign(c.r) * rand(c.r, 3, 9) * DEG * c.tilt,
+        spec,
+        tape: Math.floor(c.r() * 3),
+      })
+    }
+  })
+  return out
+}
+
 function arrange(layout: Extract<Layout, { arrange: Arrange }>, c: Ctx): Print[] {
   const spec = layout.kind === 'polaroid' ? POLAROID : PRINT
   const mixed = layout.kind === 'scrapbook'
@@ -329,6 +375,8 @@ function arrange(layout: Extract<Layout, { arrange: Arrange }>, c: Ctx): Print[]
       return pile(c, spec)
     case 'zigzag':
       return zigzag(c, spec, layout.seed % 2 ? 1 : -1, mixed)
+    case 'hero':
+      return hero(c, spec, mixed)
   }
 }
 
@@ -383,6 +431,7 @@ const PRINT_VARIANTS: Record<'polaroid' | 'scrapbook', Variant[]> = {
     { arrange: 'scatter', seed: 1, min: 1, max: 9 },
     { arrange: 'scatter', seed: 7, min: 2, max: 9 },
     { arrange: 'zigzag', seed: 9, min: 3, max: 9 },
+    { arrange: 'hero', seed: 13, min: 3, max: 7 },
     { arrange: 'cascade', seed: 3, min: 2, max: 6 },
     { arrange: 'pile', seed: 5, min: 2, max: 5 },
     { arrange: 'tidy', seed: 2, min: 1, max: 9 },
@@ -392,6 +441,7 @@ const PRINT_VARIANTS: Record<'polaroid' | 'scrapbook', Variant[]> = {
     { arrange: 'zigzag', seed: 1, min: 2, max: 9 },
     { arrange: 'zigzag', seed: 4, min: 2, max: 9 },
     { arrange: 'scatter', seed: 3, min: 1, max: 9 },
+    { arrange: 'hero', seed: 14, min: 3, max: 7 },
     { arrange: 'cascade', seed: 8, min: 2, max: 6 },
     { arrange: 'pile', seed: 6, min: 2, max: 4 },
   ],

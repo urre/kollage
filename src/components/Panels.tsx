@@ -38,7 +38,7 @@ function LayoutThumb({ layout, ratio, style }: { layout: Layout; ratio: number; 
             ))}
           </g>
         ) : (
-          <rect key={i} className="t-cell" x={c.x} y={c.y} width={c.w} height={c.h} rx={1.5} />
+          <rect key={i} className="t-cell" x={c.x} y={c.y} width={c.w} height={c.h} rx={c.round ? c.w / 2 : 1.5} />
         ),
       )}
     </svg>

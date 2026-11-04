@@ -39,7 +39,11 @@ gestures work the same on a tilted polaroid as on a grid cell.
   derived; order within a count is picker order and the first is the default
   (tall-friendly first, since 9:16 is the default). `computeRects` splits
   `size + gap` by weight so seams line up across siblings — a `[L, 2], L`
-  split aligns with two thirds of `L, L, L`. Keep that formula.
+  split aligns with two thirds of `L, L, L`. Keep that formula. A leaf is
+  normally `L` (fills its rectangle); `O` makes it a circle, shrunk to the
+  centred square of its rectangle so it stays round in every format, with the
+  background showing around it. `drawScene` clips it with an ellipse and the
+  DOM overlay uses `border-radius: 50%`, which is the same shape.
 - **Polaroid / Klippbok (prints):** arrangement functions (`single`, `tidy`,
   `scatter`, `zigzag`, `cascade`, `pile`) place white-framed prints relative to
   the canvas size, so they adapt to every format. `single` is the one-photo
