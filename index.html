@@ -12,7 +12,67 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <title>Kollage</title>
+
+    <title>Kollage — gör kollage av dina bilder i mobilen</title>
+    <meta
+      name="description"
+      content="Gör kollage av dina bilder direkt i mobilen: rutnät, polaroid eller klippbok, panorera och zooma varje bild, spara som PNG eller JPG. Allt sker i webbläsaren — bilderna lämnar aldrig telefonen."
+    />
+    <link rel="canonical" href="https://urre.github.io/kollage/" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph and Twitter want absolute URLs, so these cannot use the
+         Vite base the way the tags above do. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Kollage" />
+    <meta property="og:locale" content="sv_SE" />
+    <meta property="og:url" content="https://urre.github.io/kollage/" />
+    <meta property="og:title" content="Kollage — gör kollage av dina bilder i mobilen" />
+    <meta
+      property="og:description"
+      content="Rutnät, polaroid eller klippbok. Panorera och zooma varje bild och spara som PNG eller JPG. Allt sker i webbläsaren — bilderna lämnar aldrig telefonen."
+    />
+    <meta property="og:image" content="https://urre.github.io/kollage/og.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Kollage på två telefoner: ett rutnät med fyra bilder och en klippbokssida med tejpade kort." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Kollage — gör kollage av dina bilder i mobilen" />
+    <meta
+      name="twitter:description"
+      content="Rutnät, polaroid eller klippbok. Panorera och zooma varje bild och spara som PNG eller JPG. Allt sker i webbläsaren — bilderna lämnar aldrig telefonen."
+    />
+    <meta name="twitter:image" content="https://urre.github.io/kollage/og.jpg" />
+    <meta name="twitter:image:alt" content="Kollage på två telefoner: ett rutnät med fyra bilder och en klippbokssida med tejpade kort." />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Kollage",
+        "url": "https://urre.github.io/kollage/",
+        "description": "Gör kollage av dina bilder direkt i mobilen: rutnät, polaroid eller klippbok, panorera och zooma varje bild, spara som PNG eller JPG. Allt sker i webbläsaren — bilderna lämnar aldrig telefonen.",
+        "inLanguage": "sv-SE",
+        "applicationCategory": "MultimediaApplication",
+        "applicationSubCategory": "Photo collage",
+        "operatingSystem": "iOS, Android, Windows, macOS",
+        "browserRequirements": "Kräver JavaScript och en modern webbläsare",
+        "image": "https://urre.github.io/kollage/og.jpg",
+        "screenshot": "https://urre.github.io/kollage/og.jpg",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "SEK" },
+        "author": { "@type": "Person", "name": "Urban Sandén", "url": "https://github.com/urre" },
+        "featureList": [
+          "Rutnät, polaroid och klippbok",
+          "Formaten 9:16, 4:5, 1:1, 3:2 och 16:9",
+          "Panorera, zooma och svartvitt per bild",
+          "Export till PNG eller JPG i upp till 3840×2160",
+          "Fungerar helt i webbläsaren, utan konto och utan uppladdning"
+        ],
+        "privacyPolicy": "https://github.com/urre/kollage#integritet"
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

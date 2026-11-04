@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="card.css" />
+    <style>
+      .stage { width: 1200px; height: 630px; display: grid; grid-template-columns: 1fr 520px; align-items: center; }
+      .copy { padding: 0 0 0 72px; position: relative; z-index: 2; }
+      .mark { display: flex; align-items: center; gap: 16px; margin-bottom: 30px; }
+      .mark svg { width: 56px; height: 56px; border-radius: 13px; }
+      .mark span { font-size: 23px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #8e8e93; }
+      h1 { font-size: 92px; line-height: 1; font-weight: 700; letter-spacing: -0.035em; }
+      p { margin-top: 22px; font-size: 32px; line-height: 1.3; color: #c7c7cc; max-width: 17em; letter-spacing: -0.012em; }
+      .url { margin-top: 38px; font-size: 24px; font-weight: 600; color: #ffd60a; letter-spacing: -0.01em; }
+      .shots { position: relative; height: 630px; }
+      .phone { position: absolute; width: 292px; height: 632px; }
+      .a { right: 246px; top: 116px; transform: rotate(-7deg); }
+      .b { right: -8px; top: 44px; transform: rotate(5deg); }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <div class="copy">
+        <div class="mark">
+          <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <rect width="512" height="512" rx="112" fill="#151517" />
+            <rect x="96" y="96" width="196" height="320" rx="36" fill="#ffd60a" />
+            <rect x="312" y="96" width="104" height="150" rx="30" fill="#f5f5f7" />
+            <rect x="312" y="266" width="104" height="150" rx="30" fill="#8e8e93" />
+          </svg>
+          <span>Kollage</span>
+        </div>
+        <h1>Gör kollage<br />i mobilen</h1>
+        <p>Rutnät, polaroid och klippbok. Allt sker i webbläsaren.</p>
+        <div class="url">urre.github.io/kollage</div>
+      </div>
+      <div class="shots">
+        <div class="phone a"><img src="shot-grid.png" alt="" /></div>
+        <div class="phone b"><img src="shot-klippbok.png" alt="" /></div>
+      </div>
+    </div>
+  </body>
+</html>

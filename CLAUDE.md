@@ -112,6 +112,30 @@ there is no backend, no API route, no storage. Photos are read, drawn and
 exported in the browser and never leave the phone. Keep it that way: an API
 route would turn a private app into one that handles other people's pictures.
 
+## Share image and README shot
+
+`public/og.jpg` (1200×630, linked from the Open Graph and Twitter tags in
+`index.html`) and `docs/hero.jpg` (the README image) are rendered, not drawn by
+hand. The sources are in [docs/card/](docs/card/): `og.html` and `hero.html`
+share `card.css`, and both expect two phone screenshots named `shot-grid.png`
+and `shot-klippbok.png` beside them.
+
+To redo them: run the dev server, open the app in headless Chrome at
+`375x812` with `--force-device-scale-factor=3`, run
+[docs/card/demo-photos.js](docs/card/demo-photos.js) in the page (it generates
+four stand-in landscapes and drops them into the file input, so no real
+photos end up in a public repo), screenshot one grid and one scrapbook
+collage into `docs/card/`, then screenshot the two cards at 2× and downscale:
+
+```bash
+chrome --headless=new --screenshot=og.png --window-size=1200,630 \
+  --force-device-scale-factor=2 docs/card/og.html
+magick og.png -resize 1200x630 -quality 88 public/og.jpg
+```
+
+JPG, not PNG: the same card is a quarter of the size and the artefacts do not
+show on a dark background.
+
 ## Conventions
 
 - Swedish for all user-facing text. In `src/`, identifiers and comments are
