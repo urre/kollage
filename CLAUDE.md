@@ -3,7 +3,8 @@
 A mobile-only web app for making photo collages: pick photos, choose how many
 cells and which layout, pan/zoom each photo, export a PNG or JPG. React 19 +
 TypeScript + Vite, no backend, nothing is stored — photos never leave the phone.
-Default format is **9:16 (Story)**. All UI text is **Swedish**.
+Default format is **9:16 (Story)**. All UI text is **English**; the app itself
+is called Kollage, which is a name, not a string to translate.
 
 ```bash
 npm run dev         # vite --host on port 5180 — open on the phone via this Mac's LAN IP
@@ -29,13 +30,13 @@ git push            # deploys (see below)
 into the canvas that shouldn't be in the export — selection ring and empty-cell
 placeholders are DOM overlays on purpose.
 
-**Three kinds of collage** (the "Typ" tab), all producing the same `Cell`
+**Three kinds of collage** (the "Type" tab), all producing the same `Cell`
 (photo rect in its own unrotated space + `rot` around a pivot + optional
 `frame` and `tape`). Drawing, hit-testing and pan/zoom only see cells; the
 canvas converts pointer positions into the touched cell's local space, so
 gestures work the same on a tilted polaroid as on a grid cell.
 
-- **Rutnät (grid):** add a layout by appending a tree to `TREES`. Cell count is
+- **Grid:** add a layout by appending a tree to `TREES`. Cell count is
   derived; order within a count is picker order and the first is the default
   (tall-friendly first, since 9:16 is the default). `computeRects` splits
   `size + gap` by weight so seams line up across siblings — a `[L, 2], L`
@@ -44,7 +45,7 @@ gestures work the same on a tilted polaroid as on a grid cell.
   centred square of its rectangle so it stays round in every format, with the
   background showing around it. `drawScene` clips it with an ellipse and the
   DOM overlay uses `border-radius: 50%`, which is the same shape.
-- **Polaroid / Klippbok (prints):** arrangement functions (`single`, `tidy`,
+- **Polaroid / Scrapbook (prints):** arrangement functions (`single`, `tidy`,
   `scatter`, `zigzag`, `cascade`, `pile`) place white-framed prints relative to
   the canvas size, so they adapt to every format. `single` is the one-photo
   default: one print as large as the margins allow, with the photo aspect
@@ -53,7 +54,7 @@ gestures work the same on a tilted polaroid as on a grid cell.
   `PRINT_VARIANTS` with a seed; randomness comes from a seeded PRNG and must be
   consumed the same way regardless of W/H, or a variant would look different
   in the preview and the export. `toCell` keeps rotated prints on the canvas.
-  Klippbok defaults to tape (strips at the top edge or two opposite corners)
+  Scrapbook defaults to tape (strips at the top edge or two opposite corners)
   and mixed portrait/landscape photos; inspiration was a scrapbook page and a
   polaroid wall the user shared.
 
@@ -70,11 +71,11 @@ mid-gesture (rubber band) and `settle()` eases them back.
 
 ## Mobile constraints that shaped the code
 
-- Served over **https**, so `navigator.share` exists and the **Dela** button
+- Served over **https**, so `navigator.share` exists and the **Share** button
   sends the collage straight to Bilder. Keep the feature detection anyway — it
   is missing in desktop Firefox and some in-app browsers — and keep both other
-  routes: `<a download>` and long-pressing the result image ("Lägg till i
-  Bilder"), which is still what iOS users reach for.
+  routes: `<a download>` and long-pressing the result image ("Add to Photos"),
+  which is still what iOS users reach for.
 - **iOS canvas memory**: photos are downscaled to 2048 px on import and loaded
   one at a time; export canvases are shrunk to 0×0 after `toBlob`. Max export
   is 3840×2160 (8.3 MP, under iOS's 16.7 MP canvas cap).
@@ -143,8 +144,7 @@ show on a dark background.
 
 ## Conventions
 
-- Swedish for all user-facing text. In `src/`, identifiers and comments are
-  English.
+- English everywhere: user-facing text, identifiers and comments.
 - No new runtime dependencies without a good reason.
 - Phone-only: design for 360–430 px wide, portrait. Desktop just shows the
   same column centered.

@@ -47,7 +47,7 @@ function LayoutThumb({ layout, ratio, style }: { layout: Layout; ratio: number; 
 
 export function TypePanel(props: { kind: Kind; count: number; ratio: number; style: Style; onKind: (k: Kind) => void }) {
   return (
-    <div className="scroller kinds" role="radiogroup" aria-label="Typ av kollage">
+    <div className="scroller kinds" role="radiogroup" aria-label="Collage type">
       {KINDS.map((k) => {
         const preview = layoutsFor(k.id, props.count)[0]
         return (
@@ -83,7 +83,7 @@ export function LayoutPanel(props: {
   const counts = Array.from({ length: MAX_CELLS }, (_, i) => i + 1)
   return (
     <div className="panel-stack">
-      <div className="counts" role="radiogroup" aria-label="Antal bilder">
+      <div className="counts" role="radiogroup" aria-label="Number of photos">
         {counts.map((n) => (
           <button
             key={n}
@@ -169,19 +169,19 @@ export function StylePanel({ kind, style, onStyle }: { kind: Kind; style: Style;
     <div className="panel-stack style-panel">
       {prints ? (
         <>
-          <Slider label="Storlek" value={style.scale} min={SCALE_RANGE[0]} max={SCALE_RANGE[1]} onChange={(scale) => onStyle({ scale })} />
-          <Slider label="Lutning" value={style.tilt} min={0} max={TILT_MAX} onChange={(tilt) => onStyle({ tilt })} />
+          <Slider label="Size" value={style.scale} min={SCALE_RANGE[0]} max={SCALE_RANGE[1]} onChange={(scale) => onStyle({ scale })} />
+          <Slider label="Tilt" value={style.tilt} min={0} max={TILT_MAX} onChange={(tilt) => onStyle({ tilt })} />
         </>
       ) : (
         <>
-          <Slider label="Mellanrum" value={style.gap} min={0} max={GAP_MAX} onChange={(gap) => onStyle({ gap })} />
-          <Slider label="Hörn" value={style.radius} min={0} max={RADIUS_MAX} onChange={(radius) => onStyle({ radius })} />
+          <Slider label="Gap" value={style.gap} min={0} max={GAP_MAX} onChange={(gap) => onStyle({ gap })} />
+          <Slider label="Corners" value={style.radius} min={0} max={RADIUS_MAX} onChange={(radius) => onStyle({ radius })} />
         </>
       )}
-      <div className="swatches" role="radiogroup" aria-label="Bakgrund">
+      <div className="swatches" role="radiogroup" aria-label="Background">
         {prints && (
           <button className="toggle" aria-pressed={style.tape} data-active={style.tape} onClick={() => onStyle({ tape: !style.tape })}>
-            Tejp
+            Tape
           </button>
         )}
         {(prints ? PAPERS : BACKGROUNDS).map((bg) => (
@@ -189,7 +189,7 @@ export function StylePanel({ kind, style, onStyle }: { kind: Kind; style: Style;
             key={bg}
             role="radio"
             aria-checked={bg === style.bg}
-            aria-label={`Bakgrund ${bg}`}
+            aria-label={`Background ${bg}`}
             className="swatch"
             data-active={bg === style.bg}
             style={{ background: bg }}
@@ -212,15 +212,15 @@ export function PhotosPanel(props: {
 }) {
   return (
     <div className="panel-stack">
-      <p className="panel-note">{props.picking ? 'Välj en bild till rutan' : 'Tryck på en ruta i kollaget för att byta bild'}</p>
+      <p className="panel-note">{props.picking ? 'Choose a photo for the cell' : 'Tap a cell in the collage to change its photo'}</p>
       <div className="scroller photos">
         <button className="tile tile-action" onClick={props.onAdd}>
           <PlusIcon />
-          <span>Lägg till</span>
+          <span>Add</span>
         </button>
         <button className="tile tile-action" onClick={props.onShuffle}>
           <ShuffleIcon />
-          <span>Blanda</span>
+          <span>Shuffle</span>
         </button>
         {props.photos.map((p) => {
           const at = props.usedAt.get(p.id)
@@ -231,12 +231,12 @@ export function PhotosPanel(props: {
                 data-picking={props.picking}
                 data-used={at !== undefined}
                 onClick={() => props.onPick(p.id)}
-                aria-label={at !== undefined ? `Bild i ruta ${at + 1}` : 'Bild som inte används'}
+                aria-label={at !== undefined ? `Photo in cell ${at + 1}` : 'Photo not in use'}
               >
                 <img src={p.thumb} alt="" draggable={false} />
                 {at !== undefined && <span className="badge">{at + 1}</span>}
               </button>
-              <button className="tile-remove" aria-label="Ta bort bild" onClick={() => props.onRemove(p.id)}>
+              <button className="tile-remove" aria-label="Remove photo" onClick={() => props.onRemove(p.id)}>
                 <CloseIcon />
               </button>
             </div>

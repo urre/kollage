@@ -5,7 +5,7 @@ import { Sheet } from './Sheet'
 
 type Kind = 'jpg' | 'png'
 // url (blob:) backs the download link; preview (data:) backs the <img>.
-// iOS Safari's long-press "Lägg till i Bilder" is unreliable on blob: images
+// iOS Safari's long-press "Add to Photos" is unreliable on blob: images
 // but works on data: images, which is the whole point of the preview.
 type Result = { url: string; preview: string; file: File }
 
@@ -19,8 +19,8 @@ function toDataUrl(blob: Blob): Promise<string> {
 }
 
 const KINDS: { id: Kind; label: string; hint: string; mime: 'image/jpeg' | 'image/png' }[] = [
-  { id: 'jpg', label: 'JPG', hint: 'Mindre fil', mime: 'image/jpeg' },
-  { id: 'png', label: 'PNG', hint: 'Bäst kvalitet', mime: 'image/png' },
+  { id: 'jpg', label: 'JPG', hint: 'Smaller file', mime: 'image/jpeg' },
+  { id: 'png', label: 'PNG', hint: 'Best quality', mime: 'image/png' },
 ]
 
 function fileName(kind: Kind) {
@@ -50,11 +50,11 @@ export function ExportSheet({ scene, format, empty, onClose }: { scene: Scene; f
       const k = KINDS.find((x) => x.id === kind)!
       const blob = await renderToBlob(scene, format, k.mime)
       const file = new File([blob], fileName(kind), { type: k.mime })
-      // No automatic download: on iOS it pops a "Hämta?" dialog that sends the
-      // file to Filer, which is not where people expect their photos.
+      // No automatic download: on iOS it pops a "Download?" dialog that sends
+      // the file to Files, which is not where people expect their photos.
       setResult({ url: URL.createObjectURL(file), preview: await toDataUrl(blob), file })
     } catch {
-      setError('Det gick inte att skapa bilden. Prova JPG eller färre bilder.')
+      setError('The image could not be created. Try JPG, or fewer photos.')
     } finally {
       setBusy(false)
     }
@@ -75,10 +75,10 @@ export function ExportSheet({ scene, format, empty, onClose }: { scene: Scene; f
   const [W, H] = format.size
 
   return (
-    <Sheet title="Spara kollage" onClose={onClose}>
+    <Sheet title="Save collage" onClose={onClose}>
       {() => (
         <>
-          <div className="segmented" role="radiogroup" aria-label="Filformat">
+          <div className="segmented" role="radiogroup" aria-label="File format">
             {KINDS.map((k) => (
               <button key={k.id} role="radio" aria-checked={k.id === kind} data-active={k.id === kind} onClick={() => pickKind(k.id)}>
                 <strong>{k.label}</strong>
@@ -89,10 +89,10 @@ export function ExportSheet({ scene, format, empty, onClose }: { scene: Scene; f
 
           {result ? (
             <div className="result">
-              <img src={result.preview} alt="Ditt kollage" className="result-img" />
+              <img src={result.preview} alt="Your collage" className="result-img" />
               <p className="result-how">
-                Håll fingret på bilden och välj <strong>Lägg till i Bilder</strong>
-                <span className="muted"> (Android: Ladda ned bild)</span>
+                Press and hold the image, then choose <strong>Add to Photos</strong>
+                <span className="muted"> (Android: Download image)</span>
               </p>
               <p className="muted">
                 {W} × {H} px · {(result.file.size / 1e6).toFixed(1)} MB
@@ -100,13 +100,13 @@ export function ExportSheet({ scene, format, empty, onClose }: { scene: Scene; f
             </div>
           ) : (
             <p className="muted sheet-note">
-              {W} × {H} px. Bilden skapas i telefonen och laddas aldrig upp.
+              {W} × {H} px. The image is made on your phone and never uploaded.
             </p>
           )}
 
           {empty > 0 && (
             <p className="muted sheet-note">
-              {empty === 1 ? 'En ruta är tom' : `${empty} rutor är tomma`} och blir bakgrund i bilden.
+              {empty === 1 ? 'One cell is empty' : `${empty} cells are empty`} and will show the background.
             </p>
           )}
 
@@ -117,19 +117,19 @@ export function ExportSheet({ scene, format, empty, onClose }: { scene: Scene; f
               <>
                 <a className="btn btn-secondary" href={result.url} download={result.file.name}>
                   <DownloadIcon />
-                  Spara som fil
+                  Save as file
                 </a>
                 {canShare && (
                   <button className="btn btn-secondary" onClick={share}>
                     <ShareIcon />
-                    Dela
+                    Share
                   </button>
                 )}
               </>
             ) : (
               <button className="btn btn-primary" onClick={create} disabled={busy}>
                 {busy ? <span className="spinner" /> : <DownloadIcon />}
-                {busy ? 'Skapar bild…' : `Skapa ${kind.toUpperCase()}`}
+                {busy ? 'Creating image…' : `Create ${kind.toUpperCase()}`}
               </button>
             )}
           </div>

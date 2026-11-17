@@ -1,32 +1,32 @@
 # Kollage
 
-Gör kollage av dina bilder, direkt i mobilen.
+Make collages from your photos, right on your phone.
 
 **[urre.github.io/kollage](https://urre.github.io/kollage/)**
 
-![Kollage: rubriken "Gör kollage i mobilen" bredvid två telefoner som visar ett rutnät och en klippbokssida i gult, vitt, grått och svart](public/og.jpg)
+![Kollage: the headline "Collages on your phone" beside two phones showing a grid and a scrapbook page in yellow, white, grey and black](public/og.jpg)
 
-Välj bilder, bestäm hur många rutor och vilken layout, dra och nyp varje bild
-på plats, spara som PNG eller JPG — eller dela direkt till Bilder.
+Pick your photos, choose how many cells and which layout, drag and pinch each
+photo into place, save as PNG or JPG — or share it straight to Photos.
 
-- **Tre sorters kollage:** rutnät, polaroid och klippbok
-- **Format:** 9:16 (story), 4:5, 1:1, 3:2 och 16:9
-- **Per bild:** panorering, zoom och svartvitt
-- **Export:** upp till 3840×2160
+- **Three kinds of collage:** grid, polaroid and scrapbook
+- **Formats:** 9:16 (story), 4:5, 1:1, 3:2 and 16:9
+- **Per photo:** pan, zoom and black and white
+- **Export:** up to 3840×2160
 
-## Integritet
+## Privacy
 
-Allt sker i webbläsaren. Inga konton, ingen server, ingen lagring — bilderna
-läses, ritas och exporteras på telefonen och skickas aldrig någonstans.
+Everything happens in the browser. No accounts, no server, no storage — your
+photos are read, drawn and exported on the phone and never sent anywhere.
 
-## Utveckling
+## Development
 
-React 19 + TypeScript + Vite, inga runtime-beroenden utöver React.
+React 19 + TypeScript + Vite, with no runtime dependencies beyond React.
 
 ```bash
 npm install
-npm run dev        # vite --host på port 5180 — öppna via datorns IP i mobilen
+npm run dev        # vite --host on port 5180 — open it on your phone via this Mac's LAN IP
 npm run build      # typecheck + build → dist/
 ```
 
-En push till `main` bygger och publicerar till GitHub Pages.
+A push to `main` builds and publishes to GitHub Pages.

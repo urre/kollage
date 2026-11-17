@@ -114,7 +114,7 @@ export function Sheet({ title, onClose, closable = true, children }: Props) {
           <div className="sheet-head">
             <h2 id="sheet-title">{title}</h2>
             {closable && (
-              <button className="icon-btn" onClick={() => close()} aria-label="Stäng">
+              <button className="icon-btn" onClick={() => close()} aria-label="Close">
                 <CloseIcon />
               </button>
             )}

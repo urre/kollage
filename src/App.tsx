@@ -24,15 +24,15 @@ import { initialState, layoutIdFor, reducer } from './state'
 type Tab = 'type' | 'layout' | 'format' | 'style' | 'photos'
 
 const TABS: { id: Tab; label: string; icon: ReactNode }[] = [
-  { id: 'type', label: 'Typ', icon: <TypeIcon /> },
+  { id: 'type', label: 'Type', icon: <TypeIcon /> },
   { id: 'layout', label: 'Layout', icon: <LayoutIcon /> },
   { id: 'format', label: 'Format', icon: <FormatIcon /> },
-  { id: 'style', label: 'Stil', icon: <StyleIcon /> },
-  { id: 'photos', label: 'Bilder', icon: <PhotosIcon /> },
+  { id: 'style', label: 'Style', icon: <StyleIcon /> },
+  { id: 'photos', label: 'Photos', icon: <PhotosIcon /> },
 ]
 
 function failedMessage(n: number) {
-  return n === 1 ? 'En bild gick inte att läsa.' : `${n} bilder gick inte att läsa.`
+  return n === 1 ? 'One photo could not be read.' : `${n} photos could not be read.`
 }
 
 export function App() {
@@ -110,7 +110,7 @@ export function App() {
   }
 
   const onPick = (photoId: string) => {
-    if (selected === null) return setNotice('Tryck först på rutan du vill byta bild i.')
+    if (selected === null) return setNotice('Tap the cell you want to change first.')
     dispatch({ type: 'assign', index: selected, photoId })
   }
 
@@ -139,11 +139,11 @@ export function App() {
     <div className="editor">
       <header className="topbar">
         <button className="btn-text" onClick={() => setResetting(true)}>
-          Börja om
+          Start over
         </button>
         <span className="wordmark">Kollage</span>
         <button className="btn btn-primary btn-small" onClick={() => setExporting(true)}>
-          Spara
+          Save
         </button>
       </header>
 
@@ -159,43 +159,43 @@ export function App() {
       <div className="context" aria-live="polite">
         {busy ? (
           <p className="context-hint">
-            <span className="spinner" /> Läser in bilder…
+            <span className="spinner" /> Loading photos…
           </p>
         ) : notice ? (
           <p className="context-hint">{notice}</p>
         ) : swapping ? (
           <div className="context-bar">
-            <p className="context-hint">Tryck på rutan du vill byta plats med</p>
+            <p className="context-hint">Tap the cell to swap with</p>
             <button className="chip" onClick={() => setSwapping(false)}>
-              Avbryt
+              Cancel
             </button>
           </div>
         ) : selectedHasPhoto ? (
           <div className="context-bar">
             <button className="chip" onClick={() => setTab('photos')}>
-              <ReplaceIcon /> Byt bild
+              <ReplaceIcon /> Replace
             </button>
             <button className="chip" onClick={() => setSwapping(true)}>
-              <SwapIcon /> Byt plats
+              <SwapIcon /> Swap
             </button>
             <button
               className="chip chip-toggle"
               data-active={state.slots[selected!].bw}
               aria-pressed={state.slots[selected!].bw}
-              aria-label="Svartvitt"
+              aria-label="Black and white"
               onClick={() => dispatch({ type: 'setSlot', index: selected!, slot: { bw: !state.slots[selected!].bw } })}
             >
               <ContrastIcon />
             </button>
             <button className="chip" onClick={() => dispatch({ type: 'assign', index: selected!, photoId: null })}>
-              <TrashIcon /> Töm
+              <TrashIcon /> Clear
             </button>
-            <button className="chip chip-icon" onClick={deselect} aria-label="Klar">
+            <button className="chip chip-icon" onClick={deselect} aria-label="Done">
               <CheckIcon />
             </button>
           </div>
         ) : (
-          <p className="context-hint">Tryck på en bild för att ändra · dra och nyp för att justera</p>
+          <p className="context-hint">Tap a photo to change it · drag and pinch to adjust</p>
         )}
       </div>
 
@@ -246,9 +246,9 @@ export function App() {
 
       {resetting && (
         <Confirm
-          title="Börja om?"
-          body="Kollaget töms och alla valda bilder försvinner."
-          confirmLabel="Börja om"
+          title="Start over?"
+          body="The collage is emptied and every photo you picked is removed."
+          confirmLabel="Start over"
           onConfirm={reset}
           onClose={() => setResetting(false)}
         />

@@ -37,9 +37,9 @@ export type Cell = Rect & { rot: number; px: number; py: number; round?: boolean
 export type CellOptions = { gap: number; scale: number; tilt: number; tape: boolean }
 
 export const KINDS: { id: Kind; label: string; hint: string }[] = [
-  { id: 'grid', label: 'Rutnät', hint: 'Kant i kant' },
-  { id: 'polaroid', label: 'Polaroid', hint: 'Vita ramar' },
-  { id: 'scrapbook', label: 'Klippbok', hint: 'Tejp & papper' },
+  { id: 'grid', label: 'Grid', hint: 'Edge to edge' },
+  { id: 'polaroid', label: 'Polaroid', hint: 'White frames' },
+  { id: 'scrapbook', label: 'Scrapbook', hint: 'Tape & paper' },
 ]
 
 export const MAX_CELLS = 9

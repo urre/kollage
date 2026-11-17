@@ -1,7 +1,8 @@
 {
   "name": "Kollage",
   "short_name": "Kollage",
-  "description": "Gör kollage av dina bilder, direkt i mobilen.",
+  "lang": "en",
+  "description": "Make collages from your photos, right on your phone.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

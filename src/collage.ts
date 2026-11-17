@@ -24,10 +24,10 @@ export type Format = { id: string; label: string; hint: string; size: [number, n
 // The first format is the default.
 export const FORMATS: Format[] = [
   { id: 'story', label: 'Story', hint: '9:16', size: [2160, 3840] },
-  { id: 'portrait', label: 'Porträtt', hint: '4:5', size: [2160, 2700] },
-  { id: 'square', label: 'Kvadrat', hint: '1:1', size: [2160, 2160] },
-  { id: 'landscape', label: 'Liggande', hint: '3:2', size: [3240, 2160] },
-  { id: 'wide', label: 'Bred', hint: '16:9', size: [3840, 2160] },
+  { id: 'portrait', label: 'Portrait', hint: '4:5', size: [2160, 2700] },
+  { id: 'square', label: 'Square', hint: '1:1', size: [2160, 2160] },
+  { id: 'landscape', label: 'Landscape', hint: '3:2', size: [3240, 2160] },
+  { id: 'wide', label: 'Wide', hint: '16:9', size: [3840, 2160] },
 ]
 
 export const BACKGROUNDS = ['#ffffff', '#f1ebe1', '#e5e5ea', '#1c1c1e', '#000000', '#f4d9d4', '#d6e4ee']
@@ -230,7 +230,7 @@ export function renderToBlob(scene: Scene, format: Format, type: 'image/png' | '
   canvas.width = W
   canvas.height = H
   const ctx = canvas.getContext('2d')
-  if (!ctx) return Promise.reject(new Error('Ingen canvas'))
+  if (!ctx) return Promise.reject(new Error('No canvas'))
   drawScene(ctx, W, H, scene)
   return new Promise((resolve, reject) =>
     canvas.toBlob(
@@ -238,7 +238,7 @@ export function renderToBlob(scene: Scene, format: Format, type: 'image/png' | '
         // iOS keeps canvas memory around until the backing store is shrunk.
         canvas.width = canvas.height = 0
         if (blob) resolve(blob)
-        else reject(new Error('Kunde inte skapa bilden'))
+        else reject(new Error('Could not create the image'))
       },
       type,
       0.92,
